@@ -13,11 +13,10 @@ Protótipo web que serve de espelho visual para o produto físico — a **págin
 
 - **118 elementos** com número atômico, massa, grupo/período, categoria, configuração eletrônica e descrição (PT-BR).
 - **Estética Pip-Boy**: fósforo verde, fonte monoespaçada, moldura RobCo e camada de **efeitos CRT sutis** — scanlines, flicker, grão de fósforo, reflexo de vidro e barra de varredura rolando.
-- **Sons de interface** sintetizados na hora (Web Audio, **sem arquivos**): bip ao selecionar, cliques nos botões, e um **Geiger de fundo sutil** que crepita enquanto a ficha de um elemento radioativo está aberta (para ao fechar ou ao ir para um estável). Botão **♪ SOM** liga/desliga.
+- **Sons de interface** sintetizados na hora (Web Audio, **sem arquivos**): bip ao selecionar, cliques nos botões, e um **Geiger de fundo sutil** que crepita enquanto a ficha de um elemento radioativo está aberta (para ao fechar ou ao ir para um estável).
 - **Toque em qualquer elemento** → ficha completa com **átomo animado** (núcleo pulsante com prótons/nêutrons + camadas eletrônicas reais orbitando), em **dois modelos alternáveis** pelo botão MODELO: *Atômico* (elipses inclinadas cruzando, estilo era-atômica — padrão) e *Bohr* (órbitas circulares).
 - **Elementos radioativos** (Tc, Pm e do Po em diante) ganham selo ☢, vibração do núcleo e "Geiger".
-- **Menu "LEDS DA MESA"**: comanda os LEDs da tabela **física** (Verde / Colorido / Branco / Standby).
-  A TFT permanece sempre verde; o menu só dispara o comando para o controlador.
+- **Painel de configurações** (ícone de engrenagem ⚙ no cabeçalho) recolhe os controles para não poluir a tela: liga/desliga do **som** e o **"LEDS DA MESA"** (Verde / Colorido / Branco / Standby), que comanda os LEDs da tabela **física**. A TFT permanece sempre verde; o menu só dispara o comando para o controlador. Fecha ao clicar fora.
 
 ## 🐍 Como funciona (100% Python, zero dependências)
 

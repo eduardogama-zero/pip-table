@@ -45,9 +45,21 @@
   header .blink{animation:bl 1.1s steps(2) infinite}
   @keyframes bl{50%{opacity:.15}}
 
+  /* engrenagem de configurações (recolhe som + LEDs) */
+  .gear{background:transparent;border:1px solid var(--green-dim);color:var(--green);
+    width:27px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s}
+  .gear:hover{box-shadow:0 0 8px var(--green-glow)}
+  .gear.open{background:var(--green);color:#02160c;border-color:var(--green);box-shadow:0 0 10px var(--green-glow)}
+  .gear svg{display:block}
+  /* painel de configurações (oculto até abrir a engrenagem) */
+  .settings{position:absolute;top:34px;right:14px;z-index:55;display:none;flex-direction:column;gap:11px;
+    padding:12px 14px;background:linear-gradient(180deg,#062a17,#03190d);
+    border:1px solid var(--green);box-shadow:0 0 14px var(--green-glow)}
+  .settings.show{display:flex;animation:fadein .12s ease}
+  .settings .srow{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+  .settings .slbl{font-size:9px;color:var(--green-dim);letter-spacing:1px}
+  .settings .ledrow{display:flex;gap:6px}
   /* MENU DE CONTROLE DOS LEDS DA MESA FÍSICA (só menu; não muda a TFT) */
-  .modes{display:flex;gap:6px;align-items:center}
-  .modes .lbl{font-size:9px;color:var(--green-dim);letter-spacing:1px;margin-right:2px}
   .mbtn{font-family:inherit;font-size:10px;letter-spacing:1px;color:var(--green);
     background:transparent;border:1px solid var(--green-dim);padding:3px 9px;cursor:pointer;
     display:flex;align-items:center;gap:5px;transition:all .12s}
@@ -132,15 +144,25 @@
 <div id="device" class="flicker">
   <header>
     <div class="title">PIP-TABLE 3000 <span class="blink">▮</span></div>
-    <div class="modes">
-      <button class="sndbtn" id="sndBtn" onclick="toggleSound()">♪ SOM</button>
-      <span class="lbl">LEDS DA MESA:</span>
-      <button class="mbtn on" data-m="green">VERDE</button>
-      <button class="mbtn" data-m="color"><span class="dot"></span>COLORIDO</button>
-      <button class="mbtn" data-m="white"><span class="dot"></span>BRANCO</button>
-      <button class="mbtn" data-m="standby"><span class="dot"></span>STANDBY</button>
-    </div>
+    <button class="gear" id="gearBtn" onclick="toggleSettings()" aria-label="Configurações"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1.8v3.2M12 19v3.2M4.4 4.4l2.3 2.3M17.3 17.3l2.3 2.3M1.8 12h3.2M19 12h3.2M4.4 19.6l2.3-2.3M17.3 6.7l2.3-2.3"/></svg></button>
   </header>
+
+  <!-- painel de configurações: recolhe som + LEDs; oculto até clicar na engrenagem -->
+  <div id="settings" class="settings">
+    <div class="srow">
+      <span class="slbl">SOM</span>
+      <button class="sndbtn" id="sndBtn" onclick="toggleSound()">♪ SOM</button>
+    </div>
+    <div class="srow">
+      <span class="slbl">LEDS DA MESA</span>
+      <div class="ledrow">
+        <button class="mbtn on" data-m="green">VERDE</button>
+        <button class="mbtn" data-m="color"><span class="dot"></span>COLORIDO</button>
+        <button class="mbtn" data-m="white"><span class="dot"></span>BRANCO</button>
+        <button class="mbtn" data-m="standby"><span class="dot"></span>STANDBY</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Tabela renderizada 100% em Python — as células, marcadores e a legenda são
        HTML estático (ver pip_table/render.py); o JS abaixo só liga os eventos e
@@ -236,6 +258,18 @@ function toggleSound(){
   b.classList.toggle('off',!sndOn); b.textContent=sndOn?'♪ SOM':'♪ MUDO';
   if(sndOn) blip(720,0.06,'triangle',0.045,120);
 }
+function toggleSettings(){
+  const p=document.getElementById('settings'), g=document.getElementById('gearBtn');
+  const open=p.classList.toggle('show'); g.classList.toggle('open',open);
+  blip(open?560:420,0.05,'triangle',0.04);
+}
+/* fecha o painel ao clicar fora dele (mantém aberto ao mexer nos botões internos) */
+document.addEventListener('click',ev=>{
+  const p=document.getElementById('settings');
+  if(!p.classList.contains('show')) return;
+  if(p.contains(ev.target) || document.getElementById('gearBtn').contains(ev.target)) return;
+  p.classList.remove('show'); document.getElementById('gearBtn').classList.remove('open');
+});
 
 /* ---- células e legenda vêm renderizadas do Python; aqui só ligamos os cliques ---- */
 document.querySelectorAll('#table .cell').forEach(c=>{

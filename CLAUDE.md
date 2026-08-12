@@ -65,6 +65,12 @@ A **TFT é sempre verde**. O menu "LEDS DA MESA" (Verde/Colorido/Branco/Standby)
 LEDs da tabela **física** via `sendToTable(modo)` — hoje um `console.log`; no hardware vira
 comando serial/WiFi para fita WS2812/SK6812: `{"leds":"green|color|white|standby"}`.
 
+## Configurações (engrenagem)
+Som e LEDs ficam recolhidos num painel `#settings` (oculto) aberto pelo `#gearBtn` (ícone SVG
+inline) via `toggleSettings`; fecha ao clicar fora (listener global que ignora cliques dentro do
+painel/engrenagem, para não fechar ao mexer nos botões). Manter novos controles de UI aqui em vez
+de espalhar no cabeçalho.
+
 ## Átomo (ficha do elemento)
 Átomo animado em `<canvas>` com **dois modelos alternáveis** pelo botão MODELO (`toggleModel()`,
 var `atomModel`): `drawBohr` (órbitas circulares concêntricas) e `drawEllipse` (elipses inclinadas
