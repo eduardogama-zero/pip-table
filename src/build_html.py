@@ -1,0 +1,294 @@
+# -*- coding: utf-8 -*-
+import json
+data = json.load(open("/sessions/gifted-admiring-cori/mnt/outputs/elements.json",encoding="utf-8"))
+js = json.dumps(data, ensure_ascii=False)
+
+html = r'''<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800, initial-scale=1.0, user-scalable=no">
+<title>PIP-TABLE // Tabela Periódica</title>
+<style>
+  :root{
+    --green:#41ff8a; --green-dim:#1c7a44; --green-deep:#0a2e1a;
+    --green-glow:rgba(65,255,138,.55); --bg:#02160c; --scan:rgba(0,0,0,.28);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:radial-gradient(ellipse at 50% 40%, #063d20 0%, #02160c 70%, #000 100%);
+    color:var(--green);font-family:"Courier New",ui-monospace,monospace;overflow:hidden;
+    -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+  #device{position:relative;width:800px;height:480px;margin:0 auto;padding:8px 14px 6px;
+    display:flex;flex-direction:column;filter:drop-shadow(0 0 2px var(--green-glow))}
+  #device::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:50;
+    background:repeating-linear-gradient(0deg,transparent 0 2px,var(--scan) 2px 3px);mix-blend-mode:multiply}
+  #device::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:49;
+    background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%);border-radius:14px}
+  #device.flicker{animation:flick 6s infinite steps(60)}
+  @keyframes flick{0%,97%,100%{opacity:1}98%{opacity:.82}99%{opacity:.93}}
+
+  header{display:flex;justify-content:space-between;align-items:center;
+    border-bottom:1px solid var(--green-dim);padding-bottom:4px;margin-bottom:5px;
+    letter-spacing:2px;text-shadow:0 0 6px var(--green-glow)}
+  header .title{font-size:14px;font-weight:bold;white-space:nowrap}
+  header .blink{animation:bl 1.1s steps(2) infinite}
+  @keyframes bl{50%{opacity:.15}}
+
+  /* MENU DE CONTROLE DOS LEDS DA MESA FÍSICA (só menu; não muda a TFT) */
+  .modes{display:flex;gap:6px;align-items:center}
+  .modes .lbl{font-size:9px;color:var(--green-dim);letter-spacing:1px;margin-right:2px}
+  .mbtn{font-family:inherit;font-size:10px;letter-spacing:1px;color:var(--green);
+    background:transparent;border:1px solid var(--green-dim);padding:3px 9px;cursor:pointer;
+    display:flex;align-items:center;gap:5px;transition:all .12s}
+  .mbtn .dot{width:8px;height:8px;border-radius:50%;border:1px solid currentColor}
+  .mbtn[data-m="color"]   .dot{background:conic-gradient(#ff6b6b,#ffd43b,#69db7c,#4dabf7,#b197fc,#ff6b6b);border-color:#888}
+  .mbtn[data-m="white"]   .dot{background:#fff;border-color:#cfe}
+  .mbtn[data-m="standby"] .dot{background:#0a2e1a}
+  .mbtn:hover{box-shadow:0 0 8px var(--green-glow)}
+  .mbtn.on{background:var(--green);color:#02160c;border-color:var(--green);box-shadow:0 0 10px var(--green-glow)}
+  .mbtn.on .dot{border-color:#02160c}
+
+  #table{flex:1;display:grid;grid-template-columns:repeat(18,1fr);
+    grid-template-rows:repeat(7,1fr) 6px repeat(2,1fr);gap:2px;position:relative}
+  .cell{position:relative;border:1px solid var(--green-dim);
+    background:linear-gradient(180deg,var(--green-deep),#06210f);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    cursor:pointer;overflow:hidden;transition:transform .05s, background .1s, box-shadow .1s}
+  .cell .num{position:absolute;top:1px;left:2px;font-size:6px;color:var(--green-dim);line-height:1}
+  .cell .sym{font-size:14px;font-weight:bold;line-height:1;text-shadow:0 0 5px var(--green-glow)}
+  .cell .nm{font-size:5px;color:var(--green-dim);line-height:1;margin-top:1px;
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 1px}
+  .cell:hover,.cell.active{background:var(--green);color:#02160c;box-shadow:0 0 12px var(--green-glow);z-index:5}
+  .cell:hover .num,.cell:hover .nm,.cell.active .num,.cell.active .nm{color:#0a2e1a}
+  .cell:hover .sym,.cell.active .sym{color:#02160c;text-shadow:none}
+  .cell:active{transform:scale(.92)}
+  .cat-metalloid{border-style:dashed}
+  .cat-unknown{opacity:.8;border-style:dotted}
+  .marker{display:flex;align-items:center;justify-content:center;font-size:6px;
+    color:var(--green-dim);border:1px dashed var(--green-dim);background:transparent;cursor:default}
+  .spacer{grid-column:1/19}
+
+  footer{display:flex;justify-content:space-between;align-items:center;
+    border-top:1px solid var(--green-dim);margin-top:5px;padding-top:3px;
+    font-size:9px;color:var(--green-dim);letter-spacing:1px}
+  footer .legend{display:flex;gap:8px;flex-wrap:wrap}
+  footer .legend span{display:flex;align-items:center;gap:3px}
+  footer .sw{width:8px;height:8px;border:1px solid var(--green-dim);display:inline-block}
+  #ledState{color:var(--green)}
+
+  /* FICHA */
+  #overlay{position:absolute;inset:0;z-index:60;display:none;background:rgba(2,22,12,.93);
+    padding:20px 26px;flex-direction:column;animation:fadein .12s ease}
+  #overlay.show{display:flex}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .card{border:2px solid var(--green);box-shadow:0 0 18px var(--green-glow);flex:1;
+    display:flex;background:linear-gradient(180deg,#062a17,#03190d);padding:14px 18px;position:relative;gap:18px}
+  .card .close{position:absolute;top:8px;right:10px;border:1px solid var(--green);
+    padding:2px 10px;font-size:12px;cursor:pointer;letter-spacing:1px;z-index:3}
+  .card .close:active{background:var(--green);color:#02160c}
+  /* coluna do átomo */
+  .atomcol{flex:0 0 210px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border-right:1px solid var(--green-dim);padding-right:14px}
+  #atom{width:200px;height:200px;display:block}
+  .atomcol .rad{margin-top:6px;font-size:11px;letter-spacing:2px;color:#ffd43b;
+    text-shadow:0 0 8px rgba(255,212,59,.6);min-height:14px}
+  .atomcol .geiger{font-size:9px;color:var(--green-dim);letter-spacing:1px;min-height:11px}
+  /* coluna de dados */
+  .infocol{flex:1;display:flex;flex-direction:column;position:relative}
+  .infocol h1{font-size:27px;letter-spacing:2px;text-shadow:0 0 8px var(--green-glow)}
+  .infocol .cat{font-size:12px;color:var(--green-dim);margin-top:2px;letter-spacing:1px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;margin-top:12px}
+  .row{display:flex;justify-content:space-between;border-bottom:1px dotted var(--green-dim);padding:4px 2px;font-size:13px}
+  .row b{color:var(--green-dim);font-weight:normal;letter-spacing:1px}
+  .desc{margin-top:12px;font-size:12.5px;line-height:1.5;border-left:2px solid var(--green-dim);padding-left:10px;color:#bff5d4}
+  .desc::before{content:"> ";color:var(--green-dim)}
+  .nav{position:absolute;bottom:0;right:0;display:flex;gap:8px}
+  .nav div{border:1px solid var(--green);padding:3px 14px;cursor:pointer;font-size:13px}
+  .nav div:active{background:var(--green);color:#02160c}
+</style>
+</head>
+<body>
+<div id="device" class="flicker">
+  <header>
+    <div class="title">PIP-TABLE 3000 <span class="blink">▮</span></div>
+    <div class="modes">
+      <span class="lbl">LEDS DA MESA:</span>
+      <button class="mbtn on" data-m="green">VERDE</button>
+      <button class="mbtn" data-m="color"><span class="dot"></span>COLORIDO</button>
+      <button class="mbtn" data-m="white"><span class="dot"></span>BRANCO</button>
+      <button class="mbtn" data-m="standby"><span class="dot"></span>STANDBY</button>
+    </div>
+  </header>
+
+  <div id="table"></div>
+
+  <footer>
+    <div class="legend" id="legend"></div>
+    <div>MESA: <span id="ledState">VERDE</span> · ELEM: 118 · SELECIONE UM ELEMENTO</div>
+  </footer>
+
+  <div id="overlay">
+    <div class="card">
+      <div class="close" onclick="closeCard()">[ X ] FECHAR</div>
+      <div class="atomcol">
+        <canvas id="atom" width="400" height="400"></canvas>
+        <div class="rad" id="d-rad"></div>
+        <div class="geiger" id="d-geiger"></div>
+      </div>
+      <div class="infocol">
+        <h1 id="d-name"></h1>
+        <div class="cat" id="d-cat"></div>
+        <div class="grid2">
+          <div class="row"><b>NÚMERO ATÔMICO</b><span id="d-num"></span></div>
+          <div class="row"><b>MASSA ATÔMICA</b><span id="d-mass"></span></div>
+          <div class="row"><b>PRÓTONS / NÊUTRONS</b><span id="d-pn"></span></div>
+          <div class="row"><b>GRUPO / PERÍODO</b><span id="d-gp"></span></div>
+          <div class="row"><b>CAMADAS (e⁻)</b><span id="d-sh"></span></div>
+          <div class="row"><b>CATEGORIA</b><span id="d-cat2"></span></div>
+          <div class="row" style="grid-column:1/3"><b>CONFIG. ELETRÔNICA</b><span id="d-cfg"></span></div>
+        </div>
+        <div class="desc" id="d-desc"></div>
+        <div class="nav"><div onclick="step(-1)">◄ ANT</div><div onclick="step(1)">PRÓX ►</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ELEMENTS = __DATA__;
+const CATNAMES = {alkali:"Metal alcalino",alkaline:"Metal alcalino-terroso",translm:"Metal de transição",
+  postm:"Metal representativo",metalloid:"Semimetal (metaloide)",nonmetal:"Não metal",halogen:"Halogênio",
+  noble:"Gás nobre",lanth:"Lantanídeo (terra rara)",actin:"Actinídeo",unknown:"Propriedades desconhecidas"};
+const byNum={}; ELEMENTS.forEach(e=>byNum[e.n]=e);
+
+/* ---- monta a tabela ---- */
+const tbl=document.getElementById('table');
+const spacer=document.createElement('div'); spacer.className='spacer'; spacer.style.gridRow='8'; tbl.appendChild(spacer);
+function marker(txt,x,y){const m=document.createElement('div');m.className='marker';m.style.gridColumn=x;m.style.gridRow=y;m.textContent=txt;tbl.appendChild(m);}
+marker('57-71',3,6); marker('89-103',3,7);
+ELEMENTS.forEach(e=>{
+  const c=document.createElement('div');
+  c.className='cell cat-'+e.cat; c.style.gridColumn=e.x; c.style.gridRow=e.y; c.dataset.n=e.n;
+  c.innerHTML='<span class="num">'+e.n+'</span><span class="sym">'+e.sym+'</span><span class="nm">'+e.name+'</span>';
+  c.addEventListener('click',()=>openCard(e.n)); tbl.appendChild(c);
+});
+const legendCats=[['translm','Transição'],['postm','Representativo'],['nonmetal','Não metal'],
+  ['halogen','Halogênio'],['noble','Gás nobre'],['metalloid','Metaloide'],['lanth','Lantanídeo'],['actin','Actinídeo']];
+document.getElementById('legend').innerHTML=legendCats.map(([k,l])=>'<span><i class="sw cat-'+k+'"></i>'+l+'</span>').join('');
+
+/* ---- MENU: comando dos LEDs da MESA FÍSICA (a TFT não muda) ---- */
+const MLABEL={green:'VERDE',color:'COLORIDO',white:'BRANCO',standby:'STANDBY'};
+let ledMode='green';
+function setMode(m){
+  ledMode=m;
+  document.querySelectorAll('.mbtn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  document.getElementById('ledState').textContent=MLABEL[m];
+  sendToTable(m);   /* aqui entraria o comando real p/ o controlador (ver nota no chat) */
+}
+function sendToTable(m){
+  /* PROTÓTIPO: no hardware isto vira um comando serial/WiFi p/ a fita WS2812.
+     Ex.: {"leds":"color"} | "white" | "standby" | "green" */
+  console.log("CMD -> MESA:", JSON.stringify({leds:m}));
+}
+document.querySelectorAll('.mbtn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+
+/* ================= ÁTOMO ANIMADO (modelo de Bohr) ================= */
+const cvs=document.getElementById('atom'), ctx=cvs.getContext('2d');
+let anim=null, atomEl=null, t0=0;
+function startAtom(e){
+  atomEl=e; t0=performance.now();
+  cancelAnimationFrame(anim);
+  const loop=(now)=>{ drawAtom((now-t0)/1000); anim=requestAnimationFrame(loop); };
+  anim=requestAnimationFrame(loop);
+}
+function stopAtom(){ cancelAnimationFrame(anim); anim=null; }
+function drawAtom(t){
+  const e=atomEl; if(!e) return;
+  const W=cvs.width,H=cvs.height,cx=W/2,cy=H/2;
+  ctx.clearRect(0,0,W,H);
+  const shells=e.shells, ns=shells.length;
+  const rMax=W*0.46, rNuc=W*0.10;
+  const ringGap=(rMax-rNuc)/Math.max(ns,1);
+  const G='rgba(65,255,138,';
+  // tremor p/ radioativos
+  const jitter=e.radioactive? (Math.sin(t*40)*1.5+Math.random()*1.2) : 0;
+  ctx.save(); ctx.translate(jitter,jitter*0.6);
+  // órbitas
+  ctx.lineWidth=1.4;
+  for(let i=0;i<ns;i++){
+    const r=rNuc+ringGap*(i+1);
+    ctx.beginPath(); ctx.strokeStyle=G+'0.22)'; ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+  }
+  // elétrons
+  for(let i=0;i<ns;i++){
+    const r=rNuc+ringGap*(i+1);
+    const cnt=shells[i];
+    const dir=(i%2? -1:1);
+    const speed=(0.9-i*0.09)*dir;               // camadas internas mais rápidas
+    const base=t*speed + i*0.7;
+    for(let k=0;k<cnt;k++){
+      const a=base + (k*2*Math.PI/cnt);
+      const x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r;
+      ctx.beginPath();
+      const grd=ctx.createRadialGradient(x,y,0,x,y,6);
+      grd.addColorStop(0,G+'1)'); grd.addColorStop(1,G+'0)');
+      ctx.fillStyle=grd; ctx.arc(x,y,6,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.fillStyle=G+'1)'; ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+    }
+  }
+  // núcleo pulsante
+  const pulse=1+Math.sin(t*(e.radioactive?9:3))*0.06;
+  const rr=rNuc*pulse;
+  const ng=ctx.createRadialGradient(cx,cy,2,cx,cy,rr*1.5);
+  ng.addColorStop(0,'rgba(200,255,225,1)'); ng.addColorStop(0.5,G+'0.9)'); ng.addColorStop(1,G+'0)');
+  ctx.fillStyle=ng; ctx.beginPath(); ctx.arc(cx,cy,rr*1.5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#03190d'; ctx.beginPath(); ctx.arc(cx,cy,rr,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=G+'0.9)'; ctx.lineWidth=2; ctx.stroke();
+  // símbolo + Z no núcleo
+  ctx.fillStyle='#eafff2'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font='bold '+(rNuc*0.9)+'px Courier New';
+  ctx.fillText(e.sym,cx,cy-2);
+  ctx.fillStyle=G+'0.85)'; ctx.font=(rNuc*0.5)+'px Courier New';
+  ctx.fillText('p'+e.protons+' n'+e.neutrons,cx,cy+rNuc*0.75);
+  ctx.restore();
+}
+
+/* ================= FICHA ================= */
+let current=null;
+function openCard(n){
+  current=n; const e=byNum[n];
+  document.getElementById('d-name').textContent=e.name.toUpperCase();
+  document.getElementById('d-cat').textContent='// '+(CATNAMES[e.cat]||e.cat);
+  document.getElementById('d-num').textContent=e.n;
+  document.getElementById('d-mass').textContent=fmtMass(e.mass)+' u';
+  document.getElementById('d-pn').textContent=e.protons+' / '+e.neutrons;
+  document.getElementById('d-gp').textContent=(e.y<=7?'Grupo '+e.x:'—')+' / Período '+(e.y<=7?e.y:(e.cat==='lanth'?6:7));
+  document.getElementById('d-sh').textContent=e.shells.join('-');
+  document.getElementById('d-cat2').textContent=CATNAMES[e.cat]||e.cat;
+  document.getElementById('d-cfg').textContent=e.cfg;
+  document.getElementById('d-desc').textContent=e.desc;
+  document.getElementById('d-rad').textContent=e.radioactive?'☢ RADIOATIVO':'';
+  document.getElementById('d-geiger').textContent=e.radioactive?'· · ·· · ··· · ·· ·':'ESTÁVEL';
+  document.querySelectorAll('.cell').forEach(x=>x.classList.remove('active'));
+  const cell=document.querySelector('.cell[data-n="'+n+'"]'); if(cell)cell.classList.add('active');
+  document.getElementById('overlay').classList.add('show');
+  startAtom(e);
+}
+function closeCard(){document.getElementById('overlay').classList.remove('show');
+  document.querySelectorAll('.cell').forEach(x=>x.classList.remove('active'));current=null;stopAtom();}
+function step(d){if(current){let n=current+d;if(n<1)n=118;if(n>118)n=1;openCard(n);}}
+function fmtMass(m){return (Math.round(m)==m)?('['+m+']'):m.toFixed(3);}
+document.getElementById('overlay').addEventListener('click',ev=>{if(ev.target.id==='overlay')closeCard();});
+document.addEventListener('keydown',ev=>{
+  if(ev.key==='Escape')closeCard();
+  else if(ev.key==='ArrowRight')step(1);
+  else if(ev.key==='ArrowLeft')step(-1);
+});
+</script>
+</body>
+</html>'''
+
+html = html.replace("__DATA__", js)
+open("/sessions/gifted-admiring-cori/mnt/outputs/pip-table.html","w",encoding="utf-8").write(html)
+print("bytes:", len(html))
