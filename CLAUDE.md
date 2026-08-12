@@ -53,8 +53,12 @@ LEDs da tabela **física** via `sendToTable(modo)` — hoje um `console.log`; no
 comando serial/WiFi para fita WS2812/SK6812: `{"leds":"green|color|white|standby"}`.
 
 ## Átomo (ficha do elemento)
-Modelo de Bohr animado em `<canvas>`: núcleo pulsante (símbolo + p/n) e camadas reais (`e.shells`)
-com elétrons orbitando. Radioativos (`e.radioactive`) vibram + selo ☢ + "Geiger".
+Átomo animado em `<canvas>` com **dois modelos alternáveis** pelo botão MODELO (`toggleModel()`,
+var `atomModel`): `drawBohr` (órbitas circulares concêntricas) e `drawEllipse` (elipses inclinadas
+que se cruzam, estilo era-atômica; precessão lenta `spin`). Ambos usam as primitivas compartilhadas
+`drawNucleus` (núcleo pulsante, símbolo + p/n) e `drawElectron`, e as camadas reais (`e.shells`).
+Radioativos (`e.radioactive`) vibram (jitter) + selo ☢ + "Geiger". Default: Bohr; a escolha
+persiste entre elementos.
 
 ## Git
 Repositório `main`, remoto `origin` → github.com/eduardogama-zero/pip-table.

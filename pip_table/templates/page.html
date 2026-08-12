@@ -89,6 +89,10 @@
   .atomcol .rad{margin-top:6px;font-size:11px;letter-spacing:2px;color:#ffd43b;
     text-shadow:0 0 8px rgba(255,212,59,.6);min-height:14px}
   .atomcol .geiger{font-size:9px;color:var(--green-dim);letter-spacing:1px;min-height:11px}
+  .atomcol .modelbtn{margin-top:10px;border:1px solid var(--green-dim);color:var(--green);
+    font-family:inherit;font-size:9px;letter-spacing:1px;padding:3px 10px;cursor:pointer;background:transparent}
+  .atomcol .modelbtn:hover{box-shadow:0 0 8px var(--green-glow)}
+  .atomcol .modelbtn:active{background:var(--green);color:#02160c}
   /* coluna de dados */
   .infocol{flex:1;display:flex;flex-direction:column;position:relative}
   .infocol h1{font-size:27px;letter-spacing:2px;text-shadow:0 0 8px var(--green-glow)}
@@ -140,6 +144,7 @@ __LEGEND__
         <canvas id="atom" width="400" height="400"></canvas>
         <div class="rad" id="d-rad"></div>
         <div class="geiger" id="d-geiger"></div>
+        <div class="modelbtn" id="modelBtn" onclick="toggleModel()">MODELO: BOHR</div>
       </div>
       <div class="infocol">
         <h1 id="d-name"></h1>
@@ -188,34 +193,62 @@ function sendToTable(m){
 }
 document.querySelectorAll('.mbtn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
 
-/* ================= ÁTOMO ANIMADO (modelo de Bohr) ================= */
+/* ================= ÁTOMO ANIMADO ================= */
+/* Dois modelos alternáveis pelo botão MODELO na ficha:
+   - 'bohr'    : órbitas circulares concêntricas (modelo de Bohr)
+   - 'ellipse' : órbitas elípticas inclinadas que se cruzam ("era atômica") */
 const cvs=document.getElementById('atom'), ctx=cvs.getContext('2d');
-let anim=null, atomEl=null, t0=0;
+const G='rgba(65,255,138,';
+let anim=null, atomEl=null, t0=0, atomModel='bohr';
 function startAtom(e){
   atomEl=e; t0=performance.now();
   cancelAnimationFrame(anim);
-  const loop=(now)=>{ drawAtom((now-t0)/1000); anim=requestAnimationFrame(loop); };
+  const loop=(now)=>{ (atomModel==='bohr'?drawBohr:drawEllipse)((now-t0)/1000); anim=requestAnimationFrame(loop); };
   anim=requestAnimationFrame(loop);
 }
 function stopAtom(){ cancelAnimationFrame(anim); anim=null; }
-function drawAtom(t){
+function toggleModel(){
+  atomModel = (atomModel==='bohr') ? 'ellipse' : 'bohr';
+  document.getElementById('modelBtn').textContent='MODELO: '+(atomModel==='bohr'?'BOHR':'ATÔMICO');
+}
+
+/* ---- primitivas compartilhadas ---- */
+function drawElectron(x,y){
+  const grd=ctx.createRadialGradient(x,y,0,x,y,6);
+  grd.addColorStop(0,G+'1)'); grd.addColorStop(1,G+'0)');
+  ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.fillStyle=G+'1)'; ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+}
+function drawNucleus(t,e,ncx,ncy,rNuc){
+  const pulse=1+Math.sin(t*(e.radioactive?9:3))*0.06;
+  const rr=rNuc*pulse;
+  const ng=ctx.createRadialGradient(ncx,ncy,2,ncx,ncy,rr*1.5);
+  ng.addColorStop(0,'rgba(200,255,225,1)'); ng.addColorStop(0.5,G+'0.9)'); ng.addColorStop(1,G+'0)');
+  ctx.fillStyle=ng; ctx.beginPath(); ctx.arc(ncx,ncy,rr*1.5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#03190d'; ctx.beginPath(); ctx.arc(ncx,ncy,rr,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=G+'0.9)'; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle='#eafff2'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font='bold '+(rNuc*0.9)+'px Courier New';
+  ctx.fillText(e.sym,ncx,ncy-2);
+  ctx.fillStyle=G+'0.85)'; ctx.font=(rNuc*0.5)+'px Courier New';
+  ctx.fillText('p'+e.protons+' n'+e.neutrons,ncx,ncy+rNuc*0.75);
+}
+
+/* ---- modelo de Bohr: órbitas circulares concêntricas ---- */
+function drawBohr(t){
   const e=atomEl; if(!e) return;
   const W=cvs.width,H=cvs.height,cx=W/2,cy=H/2;
   ctx.clearRect(0,0,W,H);
   const shells=e.shells, ns=shells.length;
   const rMax=W*0.46, rNuc=W*0.10;
   const ringGap=(rMax-rNuc)/Math.max(ns,1);
-  const G='rgba(65,255,138,';
-  // tremor p/ radioativos
-  const jitter=e.radioactive? (Math.sin(t*40)*1.5+Math.random()*1.2) : 0;
+  const jitter=e.radioactive? (Math.sin(t*40)*1.5+Math.random()*1.2) : 0;   // tremor p/ radioativos
   ctx.save(); ctx.translate(jitter,jitter*0.6);
-  // órbitas
   ctx.lineWidth=1.4;
   for(let i=0;i<ns;i++){
     const r=rNuc+ringGap*(i+1);
     ctx.beginPath(); ctx.strokeStyle=G+'0.22)'; ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
   }
-  // elétrons
   for(let i=0;i<ns;i++){
     const r=rNuc+ringGap*(i+1);
     const cnt=shells[i];
@@ -224,28 +257,46 @@ function drawAtom(t){
     const base=t*speed + i*0.7;
     for(let k=0;k<cnt;k++){
       const a=base + (k*2*Math.PI/cnt);
-      const x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r;
-      ctx.beginPath();
-      const grd=ctx.createRadialGradient(x,y,0,x,y,6);
-      grd.addColorStop(0,G+'1)'); grd.addColorStop(1,G+'0)');
-      ctx.fillStyle=grd; ctx.arc(x,y,6,0,Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.fillStyle=G+'1)'; ctx.arc(x,y,2.6,0,Math.PI*2); ctx.fill();
+      drawElectron(cx+Math.cos(a)*r, cy+Math.sin(a)*r);
     }
   }
-  // núcleo pulsante
-  const pulse=1+Math.sin(t*(e.radioactive?9:3))*0.06;
-  const rr=rNuc*pulse;
-  const ng=ctx.createRadialGradient(cx,cy,2,cx,cy,rr*1.5);
-  ng.addColorStop(0,'rgba(200,255,225,1)'); ng.addColorStop(0.5,G+'0.9)'); ng.addColorStop(1,G+'0)');
-  ctx.fillStyle=ng; ctx.beginPath(); ctx.arc(cx,cy,rr*1.5,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#03190d'; ctx.beginPath(); ctx.arc(cx,cy,rr,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle=G+'0.9)'; ctx.lineWidth=2; ctx.stroke();
-  // símbolo + Z no núcleo
-  ctx.fillStyle='#eafff2'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.font='bold '+(rNuc*0.9)+'px Courier New';
-  ctx.fillText(e.sym,cx,cy-2);
-  ctx.fillStyle=G+'0.85)'; ctx.font=(rNuc*0.5)+'px Courier New';
-  ctx.fillText('p'+e.protons+' n'+e.neutrons,cx,cy+rNuc*0.75);
+  drawNucleus(t,e,cx,cy,rNuc);
+  ctx.restore();
+}
+
+/* ---- modelo "era atômica": elipses inclinadas que se cruzam ---- */
+function drawEllipse(t){
+  const e=atomEl; if(!e) return;
+  const W=cvs.width,H=cvs.height,cx=W/2,cy=H/2;
+  ctx.clearRect(0,0,W,H);
+  const shells=e.shells, ns=shells.length;
+  const rMax=W*0.46, rNuc=W*0.10;
+  const ringGap=(rMax-rNuc)/Math.max(ns,1);
+  const jitter=e.radioactive? (Math.sin(t*40)*1.5+Math.random()*1.2) : 0;   // tremor p/ radioativos
+  const spin=t*0.15;                                                        // precessão lenta (dá o ar 3D)
+  ctx.save(); ctx.translate(cx+jitter,cy+jitter*0.6);   // origem no centro p/ rotacionar as elipses
+  ctx.lineWidth=1.4;
+  for(let i=0;i<ns;i++){
+    const a=rNuc+ringGap*(i+1), b=a*0.4;
+    const tilt=i*Math.PI/ns + spin;
+    ctx.strokeStyle=G+'0.22)';
+    ctx.beginPath(); ctx.ellipse(0,0,a,b,tilt,0,Math.PI*2); ctx.stroke();
+  }
+  for(let i=0;i<ns;i++){
+    const a=rNuc+ringGap*(i+1), b=a*0.4;
+    const tilt=i*Math.PI/ns + spin;
+    const ct=Math.cos(tilt), st=Math.sin(tilt);
+    const cnt=shells[i];
+    const dir=(i%2? -1:1);
+    const speed=(0.9-i*0.09)*dir;
+    const base=t*speed + i*0.7;
+    for(let k=0;k<cnt;k++){
+      const ang=base + (k*2*Math.PI/cnt);
+      const ex=a*Math.cos(ang), ey=b*Math.sin(ang);   // ponto na elipse, depois rotaciona pelo tilt
+      drawElectron(ex*ct-ey*st, ex*st+ey*ct);
+    }
+  }
+  drawNucleus(t,e,0,0,rNuc);
   ctx.restore();
 }
 

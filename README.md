@@ -13,7 +13,7 @@ Protótipo web que serve de espelho visual para o produto físico — a **págin
 
 - **118 elementos** com número atômico, massa, grupo/período, categoria, configuração eletrônica e descrição (PT-BR).
 - **Estética Pip-Boy**: fósforo verde, scanlines de CRT, flicker, fonte monoespaçada, moldura RobCo.
-- **Toque em qualquer elemento** → ficha completa com **átomo de Bohr animado** (núcleo pulsante com prótons/nêutrons + camadas eletrônicas reais orbitando).
+- **Toque em qualquer elemento** → ficha completa com **átomo animado** (núcleo pulsante com prótons/nêutrons + camadas eletrônicas reais orbitando), em **dois modelos alternáveis** pelo botão MODELO: *Bohr* (órbitas circulares) e *Atômico* (elipses inclinadas cruzando, estilo era-atômica).
 - **Elementos radioativos** (Tc, Pm e do Po em diante) ganham selo ☢, vibração do núcleo e "Geiger".
 - **Menu "LEDS DA MESA"**: comanda os LEDs da tabela **física** (Verde / Colorido / Branco / Standby).
   A TFT permanece sempre verde; o menu só dispara o comando para o controlador.
