@@ -57,8 +57,9 @@ comando serial/WiFi para fita WS2812/SK6812: `{"leds":"green|color|white|standby
 var `atomModel`): `drawBohr` (órbitas circulares concêntricas) e `drawEllipse` (elipses inclinadas
 que se cruzam, estilo era-atômica; precessão lenta `spin`). Ambos usam as primitivas compartilhadas
 `drawNucleus` (núcleo pulsante, símbolo + p/n) e `drawElectron`, e as camadas reais (`e.shells`).
-Radioativos (`e.radioactive`) vibram (jitter) + selo ☢ + "Geiger". Default: Bohr; a escolha
-persiste entre elementos.
+Radioativos (`e.radioactive`) vibram (jitter) + selo ☢ + "Geiger". Default: Atômico (elíptico);
+a escolha persiste entre elementos. Ao mudar o default, alinhar `atomModel` (em page.html) com
+o rótulo inicial do botão `#modelBtn`.
 
 ## Git
 Repositório `main`, remoto `origin` → github.com/eduardogama-zero/pip-table.

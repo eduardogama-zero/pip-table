@@ -268,7 +268,7 @@
         <canvas id="atom" width="400" height="400"></canvas>
         <div class="rad" id="d-rad"></div>
         <div class="geiger" id="d-geiger"></div>
-        <div class="modelbtn" id="modelBtn" onclick="toggleModel()">MODELO: BOHR</div>
+        <div class="modelbtn" id="modelBtn" onclick="toggleModel()">MODELO: ATÔMICO</div>
       </div>
       <div class="infocol">
         <h1 id="d-name"></h1>
@@ -323,7 +323,7 @@ document.querySelectorAll('.mbtn').forEach(b=>b.addEventListener('click',()=>set
    - 'ellipse' : órbitas elípticas inclinadas que se cruzam ("era atômica") */
 const cvs=document.getElementById('atom'), ctx=cvs.getContext('2d');
 const G='rgba(65,255,138,';
-let anim=null, atomEl=null, t0=0, atomModel='bohr';
+let anim=null, atomEl=null, t0=0, atomModel='ellipse';
 function startAtom(e){
   atomEl=e; t0=performance.now();
   cancelAnimationFrame(anim);
