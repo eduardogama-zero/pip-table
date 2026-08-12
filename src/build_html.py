@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-import json
-data = json.load(open("/sessions/gifted-admiring-cori/mnt/outputs/elements.json",encoding="utf-8"))
+import json, os
+HERE=os.path.dirname(os.path.abspath(__file__))
+SRC=os.path.join(HERE,'elements.json')
+OUT=os.path.join(HERE,os.pardir,'index.html')
+data = json.load(open(SRC,encoding="utf-8"))
 js = json.dumps(data, ensure_ascii=False)
 
 html = r'''<!DOCTYPE html>
@@ -290,5 +293,5 @@ document.addEventListener('keydown',ev=>{
 </html>'''
 
 html = html.replace("__DATA__", js)
-open("/sessions/gifted-admiring-cori/mnt/outputs/pip-table.html","w",encoding="utf-8").write(html)
+open(OUT,"w",encoding="utf-8").write(html)
 print("bytes:", len(html))

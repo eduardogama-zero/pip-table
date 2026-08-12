@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-import json
+import json, os
+HERE=os.path.dirname(os.path.abspath(__file__))
+OUT=os.path.join(HERE,'elements.json')
 
 # n, sym, name_pt, mass, category, group(x 1-18), period(y), electron config, desc_pt
 # category codes: alkali, alkaline, translm(transition metal), postm(post-transition), metalloid,
@@ -125,9 +127,27 @@ E = [
 (118,"Og","Oganessônio",294,"unknown",18,7,"[Rn]5f14 6d10 7s2 7p6","O elemento mais pesado já criado. Nomeado em vida a Oganessian."),
 ]
 
+
+# ---- camadas eletrônicas (aufbau), prótons/nêutrons e flag radioativo ----
+_ORDER=[(1,'s'),(2,'s'),(2,'p'),(3,'s'),(3,'p'),(4,'s'),(3,'d'),(4,'p'),(5,'s'),
+(4,'d'),(5,'p'),(6,'s'),(4,'f'),(5,'d'),(6,'p'),(7,'s'),(5,'f'),(6,'d'),(7,'p')]
+_CAP={'s':2,'p':6,'d':10,'f':14}
+def _shells(Z):
+    per={}; left=Z
+    for n,l in _ORDER:
+        if left<=0: break
+        e=min(_CAP[l],left); per[n]=per.get(n,0)+e; left-=e
+    return [per[n] for n in sorted(per)]
+
 data = [dict(n=e[0],sym=e[1],name=e[2],mass=e[3],cat=e[4],x=e[5],y=e[6],cfg=e[7],desc=e[8]) for e in E]
+for _e in data:
+    _Z=_e['n']
+    _e['shells']=_shells(_Z)
+    _e['protons']=_Z
+    _e['neutrons']=max(0, round(_e['mass'])-_Z)
+    _e['radioactive']=(_Z in (43,61)) or (_Z>=84)
 print("count:", len(data))
 assert len(data)==118
-with open("/sessions/gifted-admiring-cori/mnt/outputs/elements.json","w",encoding="utf-8") as f:
+with open(OUT,"w",encoding="utf-8") as f:
     json.dump(data,f,ensure_ascii=False)
 print("ok")
