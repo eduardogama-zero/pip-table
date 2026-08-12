@@ -47,7 +47,17 @@ python build.py   # regera ../index.html a partir de data.py + page.html (sem in
   presente e nenhum marcador `__…__` residual (template não substituído).
 
 ## Estética (não quebrar)
-Verde fósforo (`--green:#41ff8a`), scanlines CRT, flicker, fonte monoespaçada, moldura RobCo.
+Verde fósforo (`--green:#41ff8a`), fonte monoespaçada, moldura RobCo. Efeitos CRT na camada
+`.fx` (grão de fósforo via SVG embutido, reflexo de vidro, `.scanbar` rolando) + `#device.flicker`
++ scanlines/vinheta nos `::before/::after` do `#device`. Tudo CSS auto-contido; manter sutil e leve
+(transform/opacidade) por causa do hardware. Respeita `prefers-reduced-motion`.
+
+## Áudio (sons do Pip-Boy)
+Blips **sintetizados** com Web Audio (funções `blip`/`geiger`; sem arquivos, nada externo).
+Gatilhos: `openCard` (bip; +`geiger` se `e.radioactive`), `closeCard`, `setMode`, `toggleModel`.
+Botão `#sndBtn` (`toggleSound`, var `sndOn`) liga/desliga; `AudioContext` criado/resumido no 1º
+gesto (`ac()`). Degrada em silêncio se Web Audio faltar. NÃO adicionar arquivos de áudio (quebra o
+auto-contido da TFT).
 A **TFT é sempre verde**. O menu "LEDS DA MESA" (Verde/Colorido/Branco/Standby) só comanda os
 LEDs da tabela **física** via `sendToTable(modo)` — hoje um `console.log`; no hardware vira
 comando serial/WiFi para fita WS2812/SK6812: `{"leds":"green|color|white|standby"}`.

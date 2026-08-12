@@ -23,6 +23,21 @@
   #device.flicker{animation:flick 6s infinite steps(60)}
   @keyframes flick{0%,97%,100%{opacity:1}98%{opacity:.82}99%{opacity:.93}}
 
+  /* ===== camada de efeitos CRT (sutis) ===== */
+  #device .fx{position:absolute;inset:0;z-index:51;pointer-events:none;overflow:hidden;border-radius:14px}
+  /* grão de fósforo — ruído estático bem fraco (SVG embutido, nada externo) */
+  #device .fx::before{content:"";position:absolute;inset:0;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  /* reflexo de vidro no canto superior */
+  #device .fx::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(120% 80% at 18% -5%, rgba(150,255,195,.06), transparent 45%)}
+  /* barra de varredura rolando lentamente */
+  #device .fx .scanbar{position:absolute;left:0;right:0;top:0;height:90px;
+    background:linear-gradient(180deg, transparent, rgba(150,255,195,.05) 46%, rgba(190,255,215,.09) 50%, rgba(150,255,195,.05) 54%, transparent);
+    animation:scanroll 7s linear infinite}
+  @keyframes scanroll{0%{transform:translateY(-100px)}100%{transform:translateY(490px)}}
+  @media (prefers-reduced-motion:reduce){#device .fx .scanbar{animation:none}}
+
   header{display:flex;justify-content:space-between;align-items:center;
     border-bottom:1px solid var(--green-dim);padding-bottom:4px;margin-bottom:5px;
     letter-spacing:2px;text-shadow:0 0 6px var(--green-glow)}
@@ -43,6 +58,12 @@
   .mbtn:hover{box-shadow:0 0 8px var(--green-glow)}
   .mbtn.on{background:var(--green);color:#02160c;border-color:var(--green);box-shadow:0 0 10px var(--green-glow)}
   .mbtn.on .dot{border-color:#02160c}
+  /* botão de som (som sintetizado; não é um LED da mesa) */
+  .sndbtn{font-family:inherit;font-size:10px;letter-spacing:1px;color:var(--green);
+    background:transparent;border:1px solid var(--green-dim);padding:3px 9px;cursor:pointer;
+    margin-right:12px;transition:all .12s}
+  .sndbtn:hover{box-shadow:0 0 8px var(--green-glow)}
+  .sndbtn.off{opacity:.45}
 
   #table{flex:1;display:grid;grid-template-columns:repeat(18,1fr);
     grid-template-rows:repeat(7,1fr) 6px repeat(2,1fr);gap:2px;position:relative}
@@ -112,6 +133,7 @@
   <header>
     <div class="title">PIP-TABLE 3000 <span class="blink">▮</span></div>
     <div class="modes">
+      <button class="sndbtn" id="sndBtn" onclick="toggleSound()">♪ SOM</button>
       <span class="lbl">LEDS DA MESA:</span>
       <button class="mbtn on" data-m="green">VERDE</button>
       <button class="mbtn" data-m="color"><span class="dot"></span>COLORIDO</button>
@@ -287,6 +309,8 @@
       </div>
     </div>
   </div>
+
+  <div class="fx"><div class="scanbar"></div></div>
 </div>
 
 <script>
@@ -295,6 +319,42 @@ const CATNAMES = {alkali:"Metal alcalino",alkaline:"Metal alcalino-terroso",tran
   postm:"Metal representativo",metalloid:"Semimetal (metaloide)",nonmetal:"Não metal",halogen:"Halogênio",
   noble:"Gás nobre",lanth:"Lantanídeo (terra rara)",actin:"Actinídeo",unknown:"Propriedades desconhecidas"};
 const byNum={}; ELEMENTS.forEach(e=>byNum[e.n]=e);
+
+/* ================= ÁUDIO (blips do Pip-Boy, sintetizados — sem arquivos) ================= */
+let AC=null, sndOn=true;
+function ac(){
+  if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(err){ AC=null; } }
+  if(AC && AC.state==='suspended') AC.resume();   // desbloqueia no 1º toque
+  return AC;
+}
+function blip(freq, dur, type, gain, slide){
+  const c=ac(); if(!c||!sndOn) return;
+  const t=c.currentTime, o=c.createOscillator(), g=c.createGain();
+  o.type=type||'square'; o.frequency.setValueAtTime(freq, t);
+  if(slide) o.frequency.exponentialRampToValueAtTime(Math.max(40,freq+slide), t+dur);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(gain||0.05, t+0.006);
+  g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t+dur+0.02);
+}
+function geiger(){   /* estalos aleatórios tipo contador Geiger */
+  const c=ac(); if(!c||!sndOn) return;
+  const n=6+Math.floor(Math.random()*5);
+  for(let i=0;i<n;i++){
+    const t=c.currentTime + Math.random()*0.55;
+    const b=c.createBuffer(1,72,c.sampleRate), d=b.getChannelData(0);
+    for(let k=0;k<72;k++) d[k]=(Math.random()*2-1)*Math.exp(-k/10);
+    const src=c.createBufferSource(), g=c.createGain();
+    src.buffer=b; g.gain.value=0.05;
+    src.connect(g).connect(c.destination); src.start(t);
+  }
+}
+function toggleSound(){
+  sndOn=!sndOn;
+  const b=document.getElementById('sndBtn');
+  b.classList.toggle('off',!sndOn); b.textContent=sndOn?'♪ SOM':'♪ MUDO';
+  if(sndOn) blip(720,0.06,'triangle',0.045,120);
+}
 
 /* ---- células e legenda vêm renderizadas do Python; aqui só ligamos os cliques ---- */
 document.querySelectorAll('#table .cell').forEach(c=>{
@@ -306,6 +366,7 @@ const MLABEL={green:'VERDE',color:'COLORIDO',white:'BRANCO',standby:'STANDBY'};
 let ledMode='green';
 function setMode(m){
   ledMode=m;
+  blip(440,0.07,'triangle',0.05);   /* clique firme */
   document.querySelectorAll('.mbtn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
   document.getElementById('ledState').textContent=MLABEL[m];
   sendToTable(m);   /* aqui entraria o comando real p/ o controlador (ver README) */
@@ -334,6 +395,7 @@ function stopAtom(){ cancelAnimationFrame(anim); anim=null; }
 function toggleModel(){
   atomModel = (atomModel==='bohr') ? 'ellipse' : 'bohr';
   document.getElementById('modelBtn').textContent='MODELO: '+(atomModel==='bohr'?'BOHR':'ATÔMICO');
+  blip(600,0.05,'triangle',0.04);   /* tique */
 }
 
 /* ---- primitivas compartilhadas ---- */
@@ -444,9 +506,12 @@ function openCard(n){
   const cell=document.querySelector('.cell[data-n="'+n+'"]'); if(cell)cell.classList.add('active');
   document.getElementById('overlay').classList.add('show');
   startAtom(e);
+  if(e.radioactive){ blip(300,0.09,'square',0.05,-90); geiger(); }   /* selecionar */
+  else { blip(660,0.08,'square',0.05,180); }
 }
 function closeCard(){document.getElementById('overlay').classList.remove('show');
-  document.querySelectorAll('.cell').forEach(x=>x.classList.remove('active'));current=null;stopAtom();}
+  document.querySelectorAll('.cell').forEach(x=>x.classList.remove('active'));current=null;stopAtom();
+  blip(340,0.10,'square',0.04,-180);}   /* fechar (descendente) */
 function step(d){if(current){let n=current+d;if(n<1)n=118;if(n>118)n=1;openCard(n);}}
 function fmtMass(m){return (Math.round(m)==m)?('['+m+']'):m.toFixed(3);}
 document.getElementById('overlay').addEventListener('click',ev=>{if(ev.target.id==='overlay')closeCard();});
