@@ -337,18 +337,23 @@ function blip(freq, dur, type, gain, slide){
   g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
   o.connect(g).connect(c.destination); o.start(t); o.stop(t+dur+0.02);
 }
-function geiger(){   /* estalos aleatórios tipo contador Geiger */
+/* Geiger de fundo: crepitar sutil e irregular enquanto a ficha de um radioativo está aberta */
+let geigerTimer=null;
+function geigerClick(gain){
   const c=ac(); if(!c||!sndOn) return;
-  const n=6+Math.floor(Math.random()*5);
-  for(let i=0;i<n;i++){
-    const t=c.currentTime + Math.random()*0.55;
-    const b=c.createBuffer(1,72,c.sampleRate), d=b.getChannelData(0);
-    for(let k=0;k<72;k++) d[k]=(Math.random()*2-1)*Math.exp(-k/10);
-    const src=c.createBufferSource(), g=c.createGain();
-    src.buffer=b; g.gain.value=0.05;
-    src.connect(g).connect(c.destination); src.start(t);
-  }
+  const b=c.createBuffer(1,72,c.sampleRate), d=b.getChannelData(0);
+  for(let k=0;k<72;k++) d[k]=(Math.random()*2-1)*Math.exp(-k/10);
+  const src=c.createBufferSource(), g=c.createGain();
+  src.buffer=b; g.gain.value=gain||0.035;              // sutil
+  src.connect(g).connect(c.destination); src.start();
 }
+function geigerTick(){
+  geigerClick();
+  if(Math.random()<0.22) setTimeout(()=>geigerClick(0.028), 45+Math.random()*45);  // estalo duplo ocasional
+  geigerTimer=setTimeout(geigerTick, 160+Math.random()*680);                        // cadência irregular
+}
+function startGeiger(){ if(!geigerTimer) geigerTick(); }
+function stopGeiger(){ if(geigerTimer){ clearTimeout(geigerTimer); geigerTimer=null; } }
 function toggleSound(){
   sndOn=!sndOn;
   const b=document.getElementById('sndBtn');
@@ -506,11 +511,11 @@ function openCard(n){
   const cell=document.querySelector('.cell[data-n="'+n+'"]'); if(cell)cell.classList.add('active');
   document.getElementById('overlay').classList.add('show');
   startAtom(e);
-  if(e.radioactive){ blip(300,0.09,'square',0.05,-90); geiger(); }   /* selecionar */
-  else { blip(660,0.08,'square',0.05,180); }
+  if(e.radioactive){ blip(300,0.09,'square',0.05,-90); startGeiger(); }   /* selecionar + Geiger de fundo */
+  else { blip(660,0.08,'square',0.05,180); stopGeiger(); }
 }
 function closeCard(){document.getElementById('overlay').classList.remove('show');
-  document.querySelectorAll('.cell').forEach(x=>x.classList.remove('active'));current=null;stopAtom();
+  document.querySelectorAll('.cell').forEach(x=>x.classList.remove('active'));current=null;stopAtom();stopGeiger();
   blip(340,0.10,'square',0.04,-180);}   /* fechar (descendente) */
 function step(d){if(current){let n=current+d;if(n<1)n=118;if(n>118)n=1;openCard(n);}}
 function fmtMass(m){return (Math.round(m)==m)?('['+m+']'):m.toFixed(3);}

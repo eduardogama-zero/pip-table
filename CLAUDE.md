@@ -54,7 +54,10 @@ Verde fósforo (`--green:#41ff8a`), fonte monoespaçada, moldura RobCo. Efeitos 
 
 ## Áudio (sons do Pip-Boy)
 Blips **sintetizados** com Web Audio (funções `blip`/`geiger`; sem arquivos, nada externo).
-Gatilhos: `openCard` (bip; +`geiger` se `e.radioactive`), `closeCard`, `setMode`, `toggleModel`.
+Gatilhos: `openCard` (bip; se `e.radioactive` inicia o **Geiger de fundo** contínuo `startGeiger`,
+senão `stopGeiger`), `closeCard` (`stopGeiger`), `setMode`, `toggleModel`. O Geiger é um loop
+`setTimeout` de cadência irregular (`geigerTick`/`geigerClick`), sutil; para ao fechar ou ao abrir
+um elemento estável.
 Botão `#sndBtn` (`toggleSound`, var `sndOn`) liga/desliga; `AudioContext` criado/resumido no 1º
 gesto (`ac()`). Degrada em silêncio se Web Audio faltar. NÃO adicionar arquivos de áudio (quebra o
 auto-contido da TFT).
