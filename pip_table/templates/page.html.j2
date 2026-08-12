@@ -1,12 +1,4 @@
-# -*- coding: utf-8 -*-
-import json, os
-HERE=os.path.dirname(os.path.abspath(__file__))
-SRC=os.path.join(HERE,'elements.json')
-OUT=os.path.join(HERE,os.pardir,'index.html')
-data = json.load(open(SRC,encoding="utf-8"))
-js = json.dumps(data, ensure_ascii=False)
-
-html = r'''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -124,11 +116,24 @@ html = r'''<!DOCTYPE html>
     </div>
   </header>
 
-  <div id="table"></div>
+  <!-- Tabela renderizada 100% em Python (Jinja) — as células, marcadores e a
+       legenda são HTML estático; o JS abaixo só liga os eventos e anima o átomo. -->
+  <div id="table">
+    <div class="spacer" style="grid-row:8"></div>
+    <div class="marker" style="grid-column:3;grid-row:6">57-71</div>
+    <div class="marker" style="grid-column:3;grid-row:7">89-103</div>
+    {% for e in elements -%}
+    <div class="cell cat-{{ e.cat }}" style="grid-column:{{ e.x }};grid-row:{{ e.y }}" data-n="{{ e.n }}"><span class="num">{{ e.n }}</span><span class="sym">{{ e.sym }}</span><span class="nm">{{ e.name }}</span></div>
+    {% endfor -%}
+  </div>
 
   <footer>
-    <div class="legend" id="legend"></div>
-    <div>MESA: <span id="ledState">VERDE</span> · ELEM: 118 · SELECIONE UM ELEMENTO</div>
+    <div class="legend" id="legend">
+      {% for k, l in legend -%}
+      <span><i class="sw cat-{{ k }}"></i>{{ l }}</span>
+      {% endfor -%}
+    </div>
+    <div>MESA: <span id="ledState">VERDE</span> · ELEM: {{ elements|length }} · SELECIONE UM ELEMENTO</div>
   </footer>
 
   <div id="overlay">
@@ -159,26 +164,16 @@ html = r'''<!DOCTYPE html>
 </div>
 
 <script>
-const ELEMENTS = __DATA__;
+const ELEMENTS = {{ elements_json|safe }};
 const CATNAMES = {alkali:"Metal alcalino",alkaline:"Metal alcalino-terroso",translm:"Metal de transição",
   postm:"Metal representativo",metalloid:"Semimetal (metaloide)",nonmetal:"Não metal",halogen:"Halogênio",
   noble:"Gás nobre",lanth:"Lantanídeo (terra rara)",actin:"Actinídeo",unknown:"Propriedades desconhecidas"};
 const byNum={}; ELEMENTS.forEach(e=>byNum[e.n]=e);
 
-/* ---- monta a tabela ---- */
-const tbl=document.getElementById('table');
-const spacer=document.createElement('div'); spacer.className='spacer'; spacer.style.gridRow='8'; tbl.appendChild(spacer);
-function marker(txt,x,y){const m=document.createElement('div');m.className='marker';m.style.gridColumn=x;m.style.gridRow=y;m.textContent=txt;tbl.appendChild(m);}
-marker('57-71',3,6); marker('89-103',3,7);
-ELEMENTS.forEach(e=>{
-  const c=document.createElement('div');
-  c.className='cell cat-'+e.cat; c.style.gridColumn=e.x; c.style.gridRow=e.y; c.dataset.n=e.n;
-  c.innerHTML='<span class="num">'+e.n+'</span><span class="sym">'+e.sym+'</span><span class="nm">'+e.name+'</span>';
-  c.addEventListener('click',()=>openCard(e.n)); tbl.appendChild(c);
+/* ---- células e legenda vêm renderizadas do Python; aqui só ligamos os cliques ---- */
+document.querySelectorAll('#table .cell').forEach(c=>{
+  c.addEventListener('click',()=>openCard(+c.dataset.n));
 });
-const legendCats=[['translm','Transição'],['postm','Representativo'],['nonmetal','Não metal'],
-  ['halogen','Halogênio'],['noble','Gás nobre'],['metalloid','Metaloide'],['lanth','Lantanídeo'],['actin','Actinídeo']];
-document.getElementById('legend').innerHTML=legendCats.map(([k,l])=>'<span><i class="sw cat-'+k+'"></i>'+l+'</span>').join('');
 
 /* ---- MENU: comando dos LEDs da MESA FÍSICA (a TFT não muda) ---- */
 const MLABEL={green:'VERDE',color:'COLORIDO',white:'BRANCO',standby:'STANDBY'};
@@ -187,7 +182,7 @@ function setMode(m){
   ledMode=m;
   document.querySelectorAll('.mbtn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
   document.getElementById('ledState').textContent=MLABEL[m];
-  sendToTable(m);   /* aqui entraria o comando real p/ o controlador (ver nota no chat) */
+  sendToTable(m);   /* aqui entraria o comando real p/ o controlador (ver README) */
 }
 function sendToTable(m){
   /* PROTÓTIPO: no hardware isto vira um comando serial/WiFi p/ a fita WS2812.
@@ -290,8 +285,4 @@ document.addEventListener('keydown',ev=>{
 });
 </script>
 </body>
-</html>'''
-
-html = html.replace("__DATA__", js)
-open(OUT,"w",encoding="utf-8").write(html)
-print("bytes:", len(html))
+</html>

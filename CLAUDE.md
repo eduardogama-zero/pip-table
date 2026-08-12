@@ -4,29 +4,40 @@ Contexto para o Claude Code manter este projeto.
 
 ## O que é
 Tabela periódica interativa estilo **Fallout / Pip-Boy** para **tela TFT touch 800×480**.
-Protótipo web de arquivo único (`index.html`) que serve de espelho visual do produto físico
-(uma tabela periódica real com LEDs endereçáveis atrás dos elementos).
+A **página é gerada 100% em Python** (template Jinja2); `index.html` é o artefato/preview
+e espelha o produto físico (uma tabela periódica real com LEDs endereçáveis atrás dos elementos).
 
 ## Arquitetura / fonte da verdade
-- **`src/gen_data.py`** — ÚNICA fonte de dados dos 118 elementos. Gera `src/elements.json`
-  com: `n, sym, name(pt), mass, cat, x, y, cfg, desc` **e** os campos derivados
-  `shells` (camadas eletrônicas via aufbau), `protons`, `neutrons`, `radioactive`.
-- **`src/build_html.py`** — injeta `src/elements.json` no template HTML e escreve `index.html` na raiz.
-- **`index.html`** — app final (dados embutidos). **Não editar dados aqui**; editar em `gen_data.py`.
+- **`pip_table/data.py`** — ÚNICA fonte de dados dos 118 elementos (lista `E`). `elements()`
+  devolve os dicts já com os campos derivados `shells` (aufbau), `protons`, `neutrons`, `radioactive`.
+- **`pip_table/templates/page.html.j2`** — a página inteira: CSS + a **grade renderizada
+  server-side por Jinja** (`{% for e in elements %}`) + o JS de interação. É aqui que se mexe em visual/UI.
+- **`pip_table/render.py`** — carrega os dados e renderiza o template (Jinja2, autoescape).
+- **`pip_table/builder.py`** / **`build.py`** — escrevem `index.html`.
+- **`index.html`** — artefato gerado. **Não editar à mão**; é sobrescrito pelo build.
+  Marcado como `linguist-generated` no `.gitattributes` (não conta como linguagem no GitHub).
 
-### Pipeline de build (sempre nesta ordem)
+### Divisão Python × JavaScript
+- **Python (Jinja) gera o conteúdo estático**: células dos 118 elementos, marcadores 57-71/89-103,
+  legenda, rodapé. Antes isso era montado por JS no cliente — agora é HTML no `index.html`.
+- **JS só faz comportamento** (não dá para gerar em Python): animação do átomo em `<canvas>`,
+  abertura da ficha ao toque, menu de LEDs e navegação por teclado. Os dados para essas
+  interações continuam embutidos como JSON (`const ELEMENTS = ...`) renderizado pelo template.
+
+### Pipeline de build
 ```bash
-cd src
-python3 gen_data.py     # (re)gera src/elements.json
-python3 build_html.py   # regenera ../index.html a partir do template + dados
+pip install -r requirements.txt   # Jinja2 (1ª vez)
+python build.py                    # regera ../index.html a partir de data.py + page.html.j2
 ```
-Caminhos são relativos ao script — roda em qualquer máquina, sem dependências além do Python 3.
 
 ## Regras importantes
-- Alterou dados de elemento (massa, categoria, descrição, posição)? → editar `E=[...]` em `gen_data.py` e rodar o pipeline.
-- Alterou visual/UI/lógica (CSS, canvas do átomo, menu)? → editar o template dentro de `build_html.py` (variável `html`) e rodar `build_html.py`.
-- Nunca editar `index.html` à mão para conteúdo que venha do pipeline; será sobrescrito.
-- Após qualquer mudança, confira: `index.html` deve ter ~47KB, `id="atom"` presente e 118 ocorrências de `"n":`.
+- Alterou dados de elemento (massa, categoria, descrição, posição)? → editar a lista `E` em
+  `pip_table/data.py` e rodar `python build.py`.
+- Alterou visual/UI/lógica (CSS, canvas do átomo, menu, grade)? → editar `pip_table/templates/page.html.j2`
+  e rodar `python build.py`.
+- Nunca editar `index.html` à mão; será sobrescrito.
+- Após mudar, confira: `index.html` deve ter 118 ocorrências de `class="cell cat-`, `id="atom"`
+  presente e nenhum `{{` residual (Jinja não renderizado).
 
 ## Estética (não quebrar)
 Verde fósforo (`--green:#41ff8a`), scanlines CRT, flicker, fonte monoespaçada, moldura RobCo.
@@ -39,13 +50,12 @@ Modelo de Bohr animado em `<canvas>`: núcleo pulsante (símbolo + p/n) e camada
 com elétrons orbitando. Radioativos (`e.radioactive`) vibram + selo ☢ + "Geiger".
 
 ## Git
-Repositório já inicializado (branch `main`). Fluxo de manutenção:
+Repositório `main`, remoto `origin` → github.com/eduardogama-zero/pip-table.
 ```bash
-git add -A && git commit -m "..."      # commitar mudanças
-git remote add origin <url>            # 1ª vez
-git push -u origin main
+git add -A && git commit -m "..."
+git push
 ```
-Para publicar demo: GitHub Pages → branch `main` / root → https://<user>.github.io/pip-table/
+Para publicar demo: GitHub Pages → branch `main` / root → https://eduardogama-zero.github.io/pip-table/
 
 ## Roadmap (ver README)
 LEDs reais via ESP32; órbitas reativas ao toque; busca/filtro; modo isótopos.

@@ -116,10 +116,143 @@
     </div>
   </header>
 
-  <div id="table"></div>
+  <!-- Tabela renderizada 100% em Python (Jinja) — as células, marcadores e a
+       legenda são HTML estático; o JS abaixo só liga os eventos e anima o átomo. -->
+  <div id="table">
+    <div class="spacer" style="grid-row:8"></div>
+    <div class="marker" style="grid-column:3;grid-row:6">57-71</div>
+    <div class="marker" style="grid-column:3;grid-row:7">89-103</div>
+<div class="cell cat-nonmetal" style="grid-column:1;grid-row:1" data-n="1"><span class="num">1</span><span class="sym">H</span><span class="nm">Hidrogênio</span></div>
+<div class="cell cat-noble" style="grid-column:18;grid-row:1" data-n="2"><span class="num">2</span><span class="sym">He</span><span class="nm">Hélio</span></div>
+<div class="cell cat-alkali" style="grid-column:1;grid-row:2" data-n="3"><span class="num">3</span><span class="sym">Li</span><span class="nm">Lítio</span></div>
+<div class="cell cat-alkaline" style="grid-column:2;grid-row:2" data-n="4"><span class="num">4</span><span class="sym">Be</span><span class="nm">Berílio</span></div>
+<div class="cell cat-metalloid" style="grid-column:13;grid-row:2" data-n="5"><span class="num">5</span><span class="sym">B</span><span class="nm">Boro</span></div>
+<div class="cell cat-nonmetal" style="grid-column:14;grid-row:2" data-n="6"><span class="num">6</span><span class="sym">C</span><span class="nm">Carbono</span></div>
+<div class="cell cat-nonmetal" style="grid-column:15;grid-row:2" data-n="7"><span class="num">7</span><span class="sym">N</span><span class="nm">Nitrogênio</span></div>
+<div class="cell cat-nonmetal" style="grid-column:16;grid-row:2" data-n="8"><span class="num">8</span><span class="sym">O</span><span class="nm">Oxigênio</span></div>
+<div class="cell cat-halogen" style="grid-column:17;grid-row:2" data-n="9"><span class="num">9</span><span class="sym">F</span><span class="nm">Flúor</span></div>
+<div class="cell cat-noble" style="grid-column:18;grid-row:2" data-n="10"><span class="num">10</span><span class="sym">Ne</span><span class="nm">Neônio</span></div>
+<div class="cell cat-alkali" style="grid-column:1;grid-row:3" data-n="11"><span class="num">11</span><span class="sym">Na</span><span class="nm">Sódio</span></div>
+<div class="cell cat-alkaline" style="grid-column:2;grid-row:3" data-n="12"><span class="num">12</span><span class="sym">Mg</span><span class="nm">Magnésio</span></div>
+<div class="cell cat-postm" style="grid-column:13;grid-row:3" data-n="13"><span class="num">13</span><span class="sym">Al</span><span class="nm">Alumínio</span></div>
+<div class="cell cat-metalloid" style="grid-column:14;grid-row:3" data-n="14"><span class="num">14</span><span class="sym">Si</span><span class="nm">Silício</span></div>
+<div class="cell cat-nonmetal" style="grid-column:15;grid-row:3" data-n="15"><span class="num">15</span><span class="sym">P</span><span class="nm">Fósforo</span></div>
+<div class="cell cat-nonmetal" style="grid-column:16;grid-row:3" data-n="16"><span class="num">16</span><span class="sym">S</span><span class="nm">Enxofre</span></div>
+<div class="cell cat-halogen" style="grid-column:17;grid-row:3" data-n="17"><span class="num">17</span><span class="sym">Cl</span><span class="nm">Cloro</span></div>
+<div class="cell cat-noble" style="grid-column:18;grid-row:3" data-n="18"><span class="num">18</span><span class="sym">Ar</span><span class="nm">Argônio</span></div>
+<div class="cell cat-alkali" style="grid-column:1;grid-row:4" data-n="19"><span class="num">19</span><span class="sym">K</span><span class="nm">Potássio</span></div>
+<div class="cell cat-alkaline" style="grid-column:2;grid-row:4" data-n="20"><span class="num">20</span><span class="sym">Ca</span><span class="nm">Cálcio</span></div>
+<div class="cell cat-translm" style="grid-column:3;grid-row:4" data-n="21"><span class="num">21</span><span class="sym">Sc</span><span class="nm">Escândio</span></div>
+<div class="cell cat-translm" style="grid-column:4;grid-row:4" data-n="22"><span class="num">22</span><span class="sym">Ti</span><span class="nm">Titânio</span></div>
+<div class="cell cat-translm" style="grid-column:5;grid-row:4" data-n="23"><span class="num">23</span><span class="sym">V</span><span class="nm">Vanádio</span></div>
+<div class="cell cat-translm" style="grid-column:6;grid-row:4" data-n="24"><span class="num">24</span><span class="sym">Cr</span><span class="nm">Cromo</span></div>
+<div class="cell cat-translm" style="grid-column:7;grid-row:4" data-n="25"><span class="num">25</span><span class="sym">Mn</span><span class="nm">Manganês</span></div>
+<div class="cell cat-translm" style="grid-column:8;grid-row:4" data-n="26"><span class="num">26</span><span class="sym">Fe</span><span class="nm">Ferro</span></div>
+<div class="cell cat-translm" style="grid-column:9;grid-row:4" data-n="27"><span class="num">27</span><span class="sym">Co</span><span class="nm">Cobalto</span></div>
+<div class="cell cat-translm" style="grid-column:10;grid-row:4" data-n="28"><span class="num">28</span><span class="sym">Ni</span><span class="nm">Níquel</span></div>
+<div class="cell cat-translm" style="grid-column:11;grid-row:4" data-n="29"><span class="num">29</span><span class="sym">Cu</span><span class="nm">Cobre</span></div>
+<div class="cell cat-translm" style="grid-column:12;grid-row:4" data-n="30"><span class="num">30</span><span class="sym">Zn</span><span class="nm">Zinco</span></div>
+<div class="cell cat-postm" style="grid-column:13;grid-row:4" data-n="31"><span class="num">31</span><span class="sym">Ga</span><span class="nm">Gálio</span></div>
+<div class="cell cat-metalloid" style="grid-column:14;grid-row:4" data-n="32"><span class="num">32</span><span class="sym">Ge</span><span class="nm">Germânio</span></div>
+<div class="cell cat-metalloid" style="grid-column:15;grid-row:4" data-n="33"><span class="num">33</span><span class="sym">As</span><span class="nm">Arsênio</span></div>
+<div class="cell cat-nonmetal" style="grid-column:16;grid-row:4" data-n="34"><span class="num">34</span><span class="sym">Se</span><span class="nm">Selênio</span></div>
+<div class="cell cat-halogen" style="grid-column:17;grid-row:4" data-n="35"><span class="num">35</span><span class="sym">Br</span><span class="nm">Bromo</span></div>
+<div class="cell cat-noble" style="grid-column:18;grid-row:4" data-n="36"><span class="num">36</span><span class="sym">Kr</span><span class="nm">Criptônio</span></div>
+<div class="cell cat-alkali" style="grid-column:1;grid-row:5" data-n="37"><span class="num">37</span><span class="sym">Rb</span><span class="nm">Rubídio</span></div>
+<div class="cell cat-alkaline" style="grid-column:2;grid-row:5" data-n="38"><span class="num">38</span><span class="sym">Sr</span><span class="nm">Estrôncio</span></div>
+<div class="cell cat-translm" style="grid-column:3;grid-row:5" data-n="39"><span class="num">39</span><span class="sym">Y</span><span class="nm">Ítrio</span></div>
+<div class="cell cat-translm" style="grid-column:4;grid-row:5" data-n="40"><span class="num">40</span><span class="sym">Zr</span><span class="nm">Zircônio</span></div>
+<div class="cell cat-translm" style="grid-column:5;grid-row:5" data-n="41"><span class="num">41</span><span class="sym">Nb</span><span class="nm">Nióbio</span></div>
+<div class="cell cat-translm" style="grid-column:6;grid-row:5" data-n="42"><span class="num">42</span><span class="sym">Mo</span><span class="nm">Molibdênio</span></div>
+<div class="cell cat-translm" style="grid-column:7;grid-row:5" data-n="43"><span class="num">43</span><span class="sym">Tc</span><span class="nm">Tecnécio</span></div>
+<div class="cell cat-translm" style="grid-column:8;grid-row:5" data-n="44"><span class="num">44</span><span class="sym">Ru</span><span class="nm">Rutênio</span></div>
+<div class="cell cat-translm" style="grid-column:9;grid-row:5" data-n="45"><span class="num">45</span><span class="sym">Rh</span><span class="nm">Ródio</span></div>
+<div class="cell cat-translm" style="grid-column:10;grid-row:5" data-n="46"><span class="num">46</span><span class="sym">Pd</span><span class="nm">Paládio</span></div>
+<div class="cell cat-translm" style="grid-column:11;grid-row:5" data-n="47"><span class="num">47</span><span class="sym">Ag</span><span class="nm">Prata</span></div>
+<div class="cell cat-translm" style="grid-column:12;grid-row:5" data-n="48"><span class="num">48</span><span class="sym">Cd</span><span class="nm">Cádmio</span></div>
+<div class="cell cat-postm" style="grid-column:13;grid-row:5" data-n="49"><span class="num">49</span><span class="sym">In</span><span class="nm">Índio</span></div>
+<div class="cell cat-postm" style="grid-column:14;grid-row:5" data-n="50"><span class="num">50</span><span class="sym">Sn</span><span class="nm">Estanho</span></div>
+<div class="cell cat-metalloid" style="grid-column:15;grid-row:5" data-n="51"><span class="num">51</span><span class="sym">Sb</span><span class="nm">Antimônio</span></div>
+<div class="cell cat-metalloid" style="grid-column:16;grid-row:5" data-n="52"><span class="num">52</span><span class="sym">Te</span><span class="nm">Telúrio</span></div>
+<div class="cell cat-halogen" style="grid-column:17;grid-row:5" data-n="53"><span class="num">53</span><span class="sym">I</span><span class="nm">Iodo</span></div>
+<div class="cell cat-noble" style="grid-column:18;grid-row:5" data-n="54"><span class="num">54</span><span class="sym">Xe</span><span class="nm">Xenônio</span></div>
+<div class="cell cat-alkali" style="grid-column:1;grid-row:6" data-n="55"><span class="num">55</span><span class="sym">Cs</span><span class="nm">Césio</span></div>
+<div class="cell cat-alkaline" style="grid-column:2;grid-row:6" data-n="56"><span class="num">56</span><span class="sym">Ba</span><span class="nm">Bário</span></div>
+<div class="cell cat-lanth" style="grid-column:3;grid-row:9" data-n="57"><span class="num">57</span><span class="sym">La</span><span class="nm">Lantânio</span></div>
+<div class="cell cat-lanth" style="grid-column:4;grid-row:9" data-n="58"><span class="num">58</span><span class="sym">Ce</span><span class="nm">Cério</span></div>
+<div class="cell cat-lanth" style="grid-column:5;grid-row:9" data-n="59"><span class="num">59</span><span class="sym">Pr</span><span class="nm">Praseodímio</span></div>
+<div class="cell cat-lanth" style="grid-column:6;grid-row:9" data-n="60"><span class="num">60</span><span class="sym">Nd</span><span class="nm">Neodímio</span></div>
+<div class="cell cat-lanth" style="grid-column:7;grid-row:9" data-n="61"><span class="num">61</span><span class="sym">Pm</span><span class="nm">Promécio</span></div>
+<div class="cell cat-lanth" style="grid-column:8;grid-row:9" data-n="62"><span class="num">62</span><span class="sym">Sm</span><span class="nm">Samário</span></div>
+<div class="cell cat-lanth" style="grid-column:9;grid-row:9" data-n="63"><span class="num">63</span><span class="sym">Eu</span><span class="nm">Európio</span></div>
+<div class="cell cat-lanth" style="grid-column:10;grid-row:9" data-n="64"><span class="num">64</span><span class="sym">Gd</span><span class="nm">Gadolínio</span></div>
+<div class="cell cat-lanth" style="grid-column:11;grid-row:9" data-n="65"><span class="num">65</span><span class="sym">Tb</span><span class="nm">Térbio</span></div>
+<div class="cell cat-lanth" style="grid-column:12;grid-row:9" data-n="66"><span class="num">66</span><span class="sym">Dy</span><span class="nm">Disprósio</span></div>
+<div class="cell cat-lanth" style="grid-column:13;grid-row:9" data-n="67"><span class="num">67</span><span class="sym">Ho</span><span class="nm">Hólmio</span></div>
+<div class="cell cat-lanth" style="grid-column:14;grid-row:9" data-n="68"><span class="num">68</span><span class="sym">Er</span><span class="nm">Érbio</span></div>
+<div class="cell cat-lanth" style="grid-column:15;grid-row:9" data-n="69"><span class="num">69</span><span class="sym">Tm</span><span class="nm">Túlio</span></div>
+<div class="cell cat-lanth" style="grid-column:16;grid-row:9" data-n="70"><span class="num">70</span><span class="sym">Yb</span><span class="nm">Itérbio</span></div>
+<div class="cell cat-lanth" style="grid-column:17;grid-row:9" data-n="71"><span class="num">71</span><span class="sym">Lu</span><span class="nm">Lutécio</span></div>
+<div class="cell cat-translm" style="grid-column:4;grid-row:6" data-n="72"><span class="num">72</span><span class="sym">Hf</span><span class="nm">Háfnio</span></div>
+<div class="cell cat-translm" style="grid-column:5;grid-row:6" data-n="73"><span class="num">73</span><span class="sym">Ta</span><span class="nm">Tântalo</span></div>
+<div class="cell cat-translm" style="grid-column:6;grid-row:6" data-n="74"><span class="num">74</span><span class="sym">W</span><span class="nm">Tungstênio</span></div>
+<div class="cell cat-translm" style="grid-column:7;grid-row:6" data-n="75"><span class="num">75</span><span class="sym">Re</span><span class="nm">Rênio</span></div>
+<div class="cell cat-translm" style="grid-column:8;grid-row:6" data-n="76"><span class="num">76</span><span class="sym">Os</span><span class="nm">Ósmio</span></div>
+<div class="cell cat-translm" style="grid-column:9;grid-row:6" data-n="77"><span class="num">77</span><span class="sym">Ir</span><span class="nm">Irídio</span></div>
+<div class="cell cat-translm" style="grid-column:10;grid-row:6" data-n="78"><span class="num">78</span><span class="sym">Pt</span><span class="nm">Platina</span></div>
+<div class="cell cat-translm" style="grid-column:11;grid-row:6" data-n="79"><span class="num">79</span><span class="sym">Au</span><span class="nm">Ouro</span></div>
+<div class="cell cat-translm" style="grid-column:12;grid-row:6" data-n="80"><span class="num">80</span><span class="sym">Hg</span><span class="nm">Mercúrio</span></div>
+<div class="cell cat-postm" style="grid-column:13;grid-row:6" data-n="81"><span class="num">81</span><span class="sym">Tl</span><span class="nm">Tálio</span></div>
+<div class="cell cat-postm" style="grid-column:14;grid-row:6" data-n="82"><span class="num">82</span><span class="sym">Pb</span><span class="nm">Chumbo</span></div>
+<div class="cell cat-postm" style="grid-column:15;grid-row:6" data-n="83"><span class="num">83</span><span class="sym">Bi</span><span class="nm">Bismuto</span></div>
+<div class="cell cat-postm" style="grid-column:16;grid-row:6" data-n="84"><span class="num">84</span><span class="sym">Po</span><span class="nm">Polônio</span></div>
+<div class="cell cat-halogen" style="grid-column:17;grid-row:6" data-n="85"><span class="num">85</span><span class="sym">At</span><span class="nm">Astato</span></div>
+<div class="cell cat-noble" style="grid-column:18;grid-row:6" data-n="86"><span class="num">86</span><span class="sym">Rn</span><span class="nm">Radônio</span></div>
+<div class="cell cat-alkali" style="grid-column:1;grid-row:7" data-n="87"><span class="num">87</span><span class="sym">Fr</span><span class="nm">Frâncio</span></div>
+<div class="cell cat-alkaline" style="grid-column:2;grid-row:7" data-n="88"><span class="num">88</span><span class="sym">Ra</span><span class="nm">Rádio</span></div>
+<div class="cell cat-actin" style="grid-column:3;grid-row:10" data-n="89"><span class="num">89</span><span class="sym">Ac</span><span class="nm">Actínio</span></div>
+<div class="cell cat-actin" style="grid-column:4;grid-row:10" data-n="90"><span class="num">90</span><span class="sym">Th</span><span class="nm">Tório</span></div>
+<div class="cell cat-actin" style="grid-column:5;grid-row:10" data-n="91"><span class="num">91</span><span class="sym">Pa</span><span class="nm">Protactínio</span></div>
+<div class="cell cat-actin" style="grid-column:6;grid-row:10" data-n="92"><span class="num">92</span><span class="sym">U</span><span class="nm">Urânio</span></div>
+<div class="cell cat-actin" style="grid-column:7;grid-row:10" data-n="93"><span class="num">93</span><span class="sym">Np</span><span class="nm">Netúnio</span></div>
+<div class="cell cat-actin" style="grid-column:8;grid-row:10" data-n="94"><span class="num">94</span><span class="sym">Pu</span><span class="nm">Plutônio</span></div>
+<div class="cell cat-actin" style="grid-column:9;grid-row:10" data-n="95"><span class="num">95</span><span class="sym">Am</span><span class="nm">Amerício</span></div>
+<div class="cell cat-actin" style="grid-column:10;grid-row:10" data-n="96"><span class="num">96</span><span class="sym">Cm</span><span class="nm">Cúrio</span></div>
+<div class="cell cat-actin" style="grid-column:11;grid-row:10" data-n="97"><span class="num">97</span><span class="sym">Bk</span><span class="nm">Berquélio</span></div>
+<div class="cell cat-actin" style="grid-column:12;grid-row:10" data-n="98"><span class="num">98</span><span class="sym">Cf</span><span class="nm">Califórnio</span></div>
+<div class="cell cat-actin" style="grid-column:13;grid-row:10" data-n="99"><span class="num">99</span><span class="sym">Es</span><span class="nm">Einstênio</span></div>
+<div class="cell cat-actin" style="grid-column:14;grid-row:10" data-n="100"><span class="num">100</span><span class="sym">Fm</span><span class="nm">Férmio</span></div>
+<div class="cell cat-actin" style="grid-column:15;grid-row:10" data-n="101"><span class="num">101</span><span class="sym">Md</span><span class="nm">Mendelévio</span></div>
+<div class="cell cat-actin" style="grid-column:16;grid-row:10" data-n="102"><span class="num">102</span><span class="sym">No</span><span class="nm">Nobélio</span></div>
+<div class="cell cat-actin" style="grid-column:17;grid-row:10" data-n="103"><span class="num">103</span><span class="sym">Lr</span><span class="nm">Laurêncio</span></div>
+<div class="cell cat-translm" style="grid-column:4;grid-row:7" data-n="104"><span class="num">104</span><span class="sym">Rf</span><span class="nm">Rutherfórdio</span></div>
+<div class="cell cat-translm" style="grid-column:5;grid-row:7" data-n="105"><span class="num">105</span><span class="sym">Db</span><span class="nm">Dúbnio</span></div>
+<div class="cell cat-translm" style="grid-column:6;grid-row:7" data-n="106"><span class="num">106</span><span class="sym">Sg</span><span class="nm">Seabórgio</span></div>
+<div class="cell cat-translm" style="grid-column:7;grid-row:7" data-n="107"><span class="num">107</span><span class="sym">Bh</span><span class="nm">Bóhrio</span></div>
+<div class="cell cat-translm" style="grid-column:8;grid-row:7" data-n="108"><span class="num">108</span><span class="sym">Hs</span><span class="nm">Hássio</span></div>
+<div class="cell cat-unknown" style="grid-column:9;grid-row:7" data-n="109"><span class="num">109</span><span class="sym">Mt</span><span class="nm">Meitnério</span></div>
+<div class="cell cat-unknown" style="grid-column:10;grid-row:7" data-n="110"><span class="num">110</span><span class="sym">Ds</span><span class="nm">Darmstácio</span></div>
+<div class="cell cat-unknown" style="grid-column:11;grid-row:7" data-n="111"><span class="num">111</span><span class="sym">Rg</span><span class="nm">Roentgênio</span></div>
+<div class="cell cat-translm" style="grid-column:12;grid-row:7" data-n="112"><span class="num">112</span><span class="sym">Cn</span><span class="nm">Copernício</span></div>
+<div class="cell cat-unknown" style="grid-column:13;grid-row:7" data-n="113"><span class="num">113</span><span class="sym">Nh</span><span class="nm">Nihônio</span></div>
+<div class="cell cat-unknown" style="grid-column:14;grid-row:7" data-n="114"><span class="num">114</span><span class="sym">Fl</span><span class="nm">Fleróvio</span></div>
+<div class="cell cat-unknown" style="grid-column:15;grid-row:7" data-n="115"><span class="num">115</span><span class="sym">Mc</span><span class="nm">Moscóvio</span></div>
+<div class="cell cat-unknown" style="grid-column:16;grid-row:7" data-n="116"><span class="num">116</span><span class="sym">Lv</span><span class="nm">Livermório</span></div>
+<div class="cell cat-unknown" style="grid-column:17;grid-row:7" data-n="117"><span class="num">117</span><span class="sym">Ts</span><span class="nm">Tennesso</span></div>
+<div class="cell cat-unknown" style="grid-column:18;grid-row:7" data-n="118"><span class="num">118</span><span class="sym">Og</span><span class="nm">Oganessônio</span></div>
+</div>
 
   <footer>
-    <div class="legend" id="legend"></div>
+    <div class="legend" id="legend">
+<span><i class="sw cat-translm"></i>Transição</span>
+<span><i class="sw cat-postm"></i>Representativo</span>
+<span><i class="sw cat-nonmetal"></i>Não metal</span>
+<span><i class="sw cat-halogen"></i>Halogênio</span>
+<span><i class="sw cat-noble"></i>Gás nobre</span>
+<span><i class="sw cat-metalloid"></i>Metaloide</span>
+<span><i class="sw cat-lanth"></i>Lantanídeo</span>
+<span><i class="sw cat-actin"></i>Actinídeo</span>
+</div>
     <div>MESA: <span id="ledState">VERDE</span> · ELEM: 118 · SELECIONE UM ELEMENTO</div>
   </footer>
 
@@ -157,20 +290,10 @@ const CATNAMES = {alkali:"Metal alcalino",alkaline:"Metal alcalino-terroso",tran
   noble:"Gás nobre",lanth:"Lantanídeo (terra rara)",actin:"Actinídeo",unknown:"Propriedades desconhecidas"};
 const byNum={}; ELEMENTS.forEach(e=>byNum[e.n]=e);
 
-/* ---- monta a tabela ---- */
-const tbl=document.getElementById('table');
-const spacer=document.createElement('div'); spacer.className='spacer'; spacer.style.gridRow='8'; tbl.appendChild(spacer);
-function marker(txt,x,y){const m=document.createElement('div');m.className='marker';m.style.gridColumn=x;m.style.gridRow=y;m.textContent=txt;tbl.appendChild(m);}
-marker('57-71',3,6); marker('89-103',3,7);
-ELEMENTS.forEach(e=>{
-  const c=document.createElement('div');
-  c.className='cell cat-'+e.cat; c.style.gridColumn=e.x; c.style.gridRow=e.y; c.dataset.n=e.n;
-  c.innerHTML='<span class="num">'+e.n+'</span><span class="sym">'+e.sym+'</span><span class="nm">'+e.name+'</span>';
-  c.addEventListener('click',()=>openCard(e.n)); tbl.appendChild(c);
+/* ---- células e legenda vêm renderizadas do Python; aqui só ligamos os cliques ---- */
+document.querySelectorAll('#table .cell').forEach(c=>{
+  c.addEventListener('click',()=>openCard(+c.dataset.n));
 });
-const legendCats=[['translm','Transição'],['postm','Representativo'],['nonmetal','Não metal'],
-  ['halogen','Halogênio'],['noble','Gás nobre'],['metalloid','Metaloide'],['lanth','Lantanídeo'],['actin','Actinídeo']];
-document.getElementById('legend').innerHTML=legendCats.map(([k,l])=>'<span><i class="sw cat-'+k+'"></i>'+l+'</span>').join('');
 
 /* ---- MENU: comando dos LEDs da MESA FÍSICA (a TFT não muda) ---- */
 const MLABEL={green:'VERDE',color:'COLORIDO',white:'BRANCO',standby:'STANDBY'};
@@ -179,7 +302,7 @@ function setMode(m){
   ledMode=m;
   document.querySelectorAll('.mbtn').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
   document.getElementById('ledState').textContent=MLABEL[m];
-  sendToTable(m);   /* aqui entraria o comando real p/ o controlador (ver nota no chat) */
+  sendToTable(m);   /* aqui entraria o comando real p/ o controlador (ver README) */
 }
 function sendToTable(m){
   /* PROTÓTIPO: no hardware isto vira um comando serial/WiFi p/ a fita WS2812.

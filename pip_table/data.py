@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
-import json, os
-HERE=os.path.dirname(os.path.abspath(__file__))
-OUT=os.path.join(HERE,'elements.json')
+"""Fonte da verdade dos 118 elementos.
 
-# n, sym, name_pt, mass, category, group(x 1-18), period(y), electron config, desc_pt
-# category codes: alkali, alkaline, translm(transition metal), postm(post-transition), metalloid,
-# nonmetal, halogen, noble, lanth, actin, unknown
+Cada tupla em ``E`` é: (n, sym, name_pt, mass, category, group[x 1-18], period[y],
+electron config, desc_pt). ``elements()`` devolve a lista já enriquecida com
+``shells`` (camadas via aufbau), ``protons``, ``neutrons`` e ``radioactive``.
+
+Códigos de categoria: alkali, alkaline, translm (metal de transição),
+postm (metal representativo), metalloid, nonmetal, halogen, noble,
+lanth (lantanídeo), actin (actinídeo), unknown.
+"""
+
 E = [
 (1,"H","Hidrogênio",1.008,"nonmetal",1,1,"1s1","Elemento mais abundante do universo. Combustível de estrelas e futura matriz energética."),
 (2,"He","Hélio",4.0026,"noble",18,1,"1s2","Gás nobre inerte, segundo mais abundante do cosmos. Usado em criogenia e balões."),
@@ -127,27 +131,39 @@ E = [
 (118,"Og","Oganessônio",294,"unknown",18,7,"[Rn]5f14 6d10 7s2 7p6","O elemento mais pesado já criado. Nomeado em vida a Oganessian."),
 ]
 
-
 # ---- camadas eletrônicas (aufbau), prótons/nêutrons e flag radioativo ----
-_ORDER=[(1,'s'),(2,'s'),(2,'p'),(3,'s'),(3,'p'),(4,'s'),(3,'d'),(4,'p'),(5,'s'),
-(4,'d'),(5,'p'),(6,'s'),(4,'f'),(5,'d'),(6,'p'),(7,'s'),(5,'f'),(6,'d'),(7,'p')]
-_CAP={'s':2,'p':6,'d':10,'f':14}
+_ORDER = [(1,'s'),(2,'s'),(2,'p'),(3,'s'),(3,'p'),(4,'s'),(3,'d'),(4,'p'),(5,'s'),
+          (4,'d'),(5,'p'),(6,'s'),(4,'f'),(5,'d'),(6,'p'),(7,'s'),(5,'f'),(6,'d'),(7,'p')]
+_CAP = {'s': 2, 'p': 6, 'd': 10, 'f': 14}
+
+
 def _shells(Z):
-    per={}; left=Z
-    for n,l in _ORDER:
-        if left<=0: break
-        e=min(_CAP[l],left); per[n]=per.get(n,0)+e; left-=e
+    per = {}
+    left = Z
+    for n, l in _ORDER:
+        if left <= 0:
+            break
+        e = min(_CAP[l], left)
+        per[n] = per.get(n, 0) + e
+        left -= e
     return [per[n] for n in sorted(per)]
 
-data = [dict(n=e[0],sym=e[1],name=e[2],mass=e[3],cat=e[4],x=e[5],y=e[6],cfg=e[7],desc=e[8]) for e in E]
-for _e in data:
-    _Z=_e['n']
-    _e['shells']=_shells(_Z)
-    _e['protons']=_Z
-    _e['neutrons']=max(0, round(_e['mass'])-_Z)
-    _e['radioactive']=(_Z in (43,61)) or (_Z>=84)
-print("count:", len(data))
-assert len(data)==118
-with open(OUT,"w",encoding="utf-8") as f:
-    json.dump(data,f,ensure_ascii=False)
-print("ok")
+
+def elements():
+    """Lista dos 118 elementos como dicts, já com campos derivados."""
+    data = [dict(n=e[0], sym=e[1], name=e[2], mass=e[3], cat=e[4],
+                 x=e[5], y=e[6], cfg=e[7], desc=e[8]) for e in E]
+    for _e in data:
+        Z = _e['n']
+        _e['shells'] = _shells(Z)
+        _e['protons'] = Z
+        _e['neutrons'] = max(0, round(_e['mass']) - Z)
+        _e['radioactive'] = (Z in (43, 61)) or (Z >= 84)
+    assert len(data) == 118, "esperados 118 elementos"
+    return data
+
+
+# Legenda de categorias exibida no rodapé (código -> rótulo).
+LEGEND = [("translm", "Transição"), ("postm", "Representativo"), ("nonmetal", "Não metal"),
+          ("halogen", "Halogênio"), ("noble", "Gás nobre"), ("metalloid", "Metaloide"),
+          ("lanth", "Lantanídeo"), ("actin", "Actinídeo")]
