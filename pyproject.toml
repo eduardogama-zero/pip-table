@@ -10,8 +10,9 @@ readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.8"
 authors = [{ name = "Eduardo Gama" }]
-keywords = ["fallout", "pip-boy", "periodic-table", "tft", "esp32", "ws2812", "jinja2"]
-dependencies = ["jinja2>=3.0"]
+keywords = ["fallout", "pip-boy", "periodic-table", "tft", "esp32", "ws2812"]
+# Sem dependências externas — templating em stdlib pura (só Python 3).
+dependencies = []
 
 [project.scripts]
 pip-table-build = "pip_table.builder:main"
@@ -20,4 +21,4 @@ pip-table-build = "pip_table.builder:main"
 packages = ["pip_table"]
 
 [tool.setuptools.package-data]
-pip_table = ["templates/*.j2"]
+pip_table = ["templates/*.html"]

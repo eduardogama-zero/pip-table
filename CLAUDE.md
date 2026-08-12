@@ -4,40 +4,47 @@ Contexto para o Claude Code manter este projeto.
 
 ## O que é
 Tabela periódica interativa estilo **Fallout / Pip-Boy** para **tela TFT touch 800×480**.
-A **página é gerada 100% em Python** (template Jinja2); `index.html` é o artefato/preview
-e espelha o produto físico (uma tabela periódica real com LEDs endereçáveis atrás dos elementos).
+A **página é gerada 100% em Python** (stdlib pura, **sem dependências externas**); `index.html`
+é o artefato/preview e espelha o produto físico (tabela real com LEDs endereçáveis atrás dos elementos).
+
+## Runtime × build (importante p/ o hardware)
+- **Runtime (a TFT)**: só o `index.html` — arquivo único **auto-contido**, sem CDN/fetch/fonte
+  externa (só fontes de sistema). É o que roda no hardware. Não adicionar dependências de runtime
+  (nada de `<script src>` externo, web fonts, CDNs) — inviabiliza a tela.
+- **Build (máquina de dev)**: Python 3, stdlib pura. Gera o `index.html`. Nada disso vai para a TFT.
 
 ## Arquitetura / fonte da verdade
 - **`pip_table/data.py`** — ÚNICA fonte de dados dos 118 elementos (lista `E`). `elements()`
   devolve os dicts já com os campos derivados `shells` (aufbau), `protons`, `neutrons`, `radioactive`.
-- **`pip_table/templates/page.html.j2`** — a página inteira: CSS + a **grade renderizada
-  server-side por Jinja** (`{% for e in elements %}`) + o JS de interação. É aqui que se mexe em visual/UI.
-- **`pip_table/render.py`** — carrega os dados e renderiza o template (Jinja2, autoescape).
+- **`pip_table/templates/page.html`** — a página inteira: CSS + os marcadores `__CELLS__`,
+  `__LEGEND__`, `__COUNT__`, `__ELEMENTS_JSON__` + o JS de interação. É aqui que se mexe em visual/UI.
+- **`pip_table/render.py`** — injeta grade/legenda/contagem/dados no template via `str.replace`
+  (stdlib pura, `html.escape` nos textos). Sem Jinja nem qualquer dependência.
 - **`pip_table/builder.py`** / **`build.py`** — escrevem `index.html`.
 - **`index.html`** — artefato gerado. **Não editar à mão**; é sobrescrito pelo build.
   Marcado como `linguist-generated` no `.gitattributes` (não conta como linguagem no GitHub).
 
 ### Divisão Python × JavaScript
-- **Python (Jinja) gera o conteúdo estático**: células dos 118 elementos, marcadores 57-71/89-103,
+- **Python gera o conteúdo estático**: células dos 118 elementos, marcadores 57-71/89-103,
   legenda, rodapé. Antes isso era montado por JS no cliente — agora é HTML no `index.html`.
 - **JS só faz comportamento** (não dá para gerar em Python): animação do átomo em `<canvas>`,
   abertura da ficha ao toque, menu de LEDs e navegação por teclado. Os dados para essas
-  interações continuam embutidos como JSON (`const ELEMENTS = ...`) renderizado pelo template.
+  interações continuam embutidos como JSON (`const ELEMENTS = ...`) injetado pelo template.
 
 ### Pipeline de build
 ```bash
-pip install -r requirements.txt   # Jinja2 (1ª vez)
-python build.py                    # regera ../index.html a partir de data.py + page.html.j2
+python build.py   # regera ../index.html a partir de data.py + page.html (sem instalar nada)
 ```
 
 ## Regras importantes
 - Alterou dados de elemento (massa, categoria, descrição, posição)? → editar a lista `E` em
   `pip_table/data.py` e rodar `python build.py`.
-- Alterou visual/UI/lógica (CSS, canvas do átomo, menu, grade)? → editar `pip_table/templates/page.html.j2`
+- Alterou visual/UI/lógica (CSS, canvas do átomo, menu, grade)? → editar `pip_table/templates/page.html`
   e rodar `python build.py`.
 - Nunca editar `index.html` à mão; será sobrescrito.
+- Não introduzir dependências: manter render em stdlib pura; runtime da TFT sem recursos externos.
 - Após mudar, confira: `index.html` deve ter 118 ocorrências de `class="cell cat-`, `id="atom"`
-  presente e nenhum `{{` residual (Jinja não renderizado).
+  presente e nenhum marcador `__…__` residual (template não substituído).
 
 ## Estética (não quebrar)
 Verde fósforo (`--green:#41ff8a`), scanlines CRT, flicker, fonte monoespaçada, moldura RobCo.

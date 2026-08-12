@@ -116,24 +116,21 @@
     </div>
   </header>
 
-  <!-- Tabela renderizada 100% em Python (Jinja) — as células, marcadores e a
-       legenda são HTML estático; o JS abaixo só liga os eventos e anima o átomo. -->
+  <!-- Tabela renderizada 100% em Python — as células, marcadores e a legenda são
+       HTML estático (ver pip_table/render.py); o JS abaixo só liga os eventos e
+       anima o átomo. Nada externo: o index.html gerado é auto-contido. -->
   <div id="table">
     <div class="spacer" style="grid-row:8"></div>
     <div class="marker" style="grid-column:3;grid-row:6">57-71</div>
     <div class="marker" style="grid-column:3;grid-row:7">89-103</div>
-    {% for e in elements -%}
-    <div class="cell cat-{{ e.cat }}" style="grid-column:{{ e.x }};grid-row:{{ e.y }}" data-n="{{ e.n }}"><span class="num">{{ e.n }}</span><span class="sym">{{ e.sym }}</span><span class="nm">{{ e.name }}</span></div>
-    {% endfor -%}
+__CELLS__
   </div>
 
   <footer>
     <div class="legend" id="legend">
-      {% for k, l in legend -%}
-      <span><i class="sw cat-{{ k }}"></i>{{ l }}</span>
-      {% endfor -%}
+__LEGEND__
     </div>
-    <div>MESA: <span id="ledState">VERDE</span> · ELEM: {{ elements|length }} · SELECIONE UM ELEMENTO</div>
+    <div>MESA: <span id="ledState">VERDE</span> · ELEM: __COUNT__ · SELECIONE UM ELEMENTO</div>
   </footer>
 
   <div id="overlay">
@@ -164,7 +161,7 @@
 </div>
 
 <script>
-const ELEMENTS = {{ elements_json|safe }};
+const ELEMENTS = __ELEMENTS_JSON__;
 const CATNAMES = {alkali:"Metal alcalino",alkaline:"Metal alcalino-terroso",translm:"Metal de transição",
   postm:"Metal representativo",metalloid:"Semimetal (metaloide)",nonmetal:"Não metal",halogen:"Halogênio",
   noble:"Gás nobre",lanth:"Lantanídeo (terra rara)",actin:"Actinídeo",unknown:"Propriedades desconhecidas"};
